@@ -13,10 +13,10 @@ mkdir /usr/local/lib/steam
 wget http://media.steampowered.com/client/installer/steam.deb
 sha1sum -c <<< "f71400e63a5e3746c09b7c291d47244667a1b169  steam.deb" && \
 dpkg -X steam.deb cb-steam && dpkg -e steam.deb cb-steam/DEBIAN
-sed -i 's/2.15/2.13/g' cb-steam/DEBIAN/control
+sed -i 's/2.15/2.13/g' cb-steam/DEBIAN/control || exit
 dpkg -b cb-steam cb-steam.deb
 
-dpkg -i cb-steam.deb || exit
+dpkg -i cb-steam.deb
 rm -f /etc/apt/sources.list.d/steam.list
 rm -f /etc/apt/trusted.gpg.d/steam.gpg
 }
