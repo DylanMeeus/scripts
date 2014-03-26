@@ -13,4 +13,4 @@ Potential issues:
 
 https://github.com/GhostSquad57/Steam-Installer-for-Wheezy/wiki
 
-Note: LC_ALL=C is only supported by Steam as "fallback", which may some games cause to fail. Installing the US locale (if not present) works correctly.
+Note: LC_ALL=C is only supported by Steam as "fallback", which may cause some games to fail. Installing the US locale (if not present) works correctly.
