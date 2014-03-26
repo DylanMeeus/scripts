@@ -6,6 +6,7 @@ Steam for Debian 7-based distributions.
 Crunchbang forum threads:
 
 http://crunchbang.org/forums/viewtopic.php?id=24711&p=1
+
 http://crunchbang.org/forums/viewtopic.php?id=33349
 
 Potential issues:
