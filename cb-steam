@@ -25,9 +25,9 @@ if [ $(uname -m) == i686 ] || [ $(uname -m) == i486 ]; then
   cp -r libc6_2.15/lib/* /usr/lib/steam || exit
   
   cat > /usr/bin/cb-steam <<EOF
-  #!/bin/bash
-  LD_LIBRARY_PATH=/usr/lib/steam/i386-linux-gnu:/usr/lib /usr/games/steam "$@"
-  EOF
+#!/bin/bash
+LD_LIBRARY_PATH=/usr/lib/steam/i386-linux-gnu:/usr/lib /usr/games/steam "$@"
+EOF
   
 else
   wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_amd64.deb
@@ -36,9 +36,9 @@ else
   cp -r libc6_2.15/lib/* /usr/lib/steam || exit
   
   cat > /usr/bin/cb-steam <<EOF
-  #!/bin/bash
-  LD_LIBRARY_PATH=/usr/lib/steam/x86_64-linux-gnu:/usr/lib /usr/games/steam "$@"
-  EOF
+#!/bin/bash
+LD_LIBRARY_PATH=/usr/lib/steam/x86_64-linux-gnu:/usr/lib /usr/games/steam "$@"
+EOF
   
 fi
 
