@@ -11,7 +11,7 @@ mkdir /tmp/cb-steam && cd /tmp/cb-steam
 mkdir /usr/local/lib/steam
 
 wget http://media.steampowered.com/client/installer/steam.deb
-sha1sum -c <<< "f71400e63a5e3746c09b7c291d47244667a1b169  steam.deb" && \
+echo 'f71400e63a5e3746c09b7c291d47244667a1b169  steam.deb' | sha1sum -c && \
 dpkg -X steam.deb cb-steam && dpkg -e steam.deb cb-steam/DEBIAN
 sed -i 's/2.15/2.13/g' cb-steam/DEBIAN/control || exit
 dpkg -b cb-steam cb-steam.deb
@@ -24,7 +24,7 @@ rm -f /etc/apt/trusted.gpg.d/steam.gpg
 arch() { 
 if [ $(uname -m) == i686 ] || [ $(uname -m) == i486 ]; then
 	wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_i386.deb
-  	sha1sum -c <<< "d45fdd5c82d1ffed1ba63a394563243637ce1b97  libc6_2.15-0ubuntu10.5_i386.deb" && \
+	echo 'd45fdd5c82d1ffed1ba63a394563243637ce1b97  libc6_2.15-0ubuntu10.5_i386.deb' | sha1sum -c && \
  	dpkg -X libc6_2.15-0ubuntu10.5_i386.deb libc6_2.15
   	cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
   	cat > /usr/bin/cb-steam <<'EOF'
@@ -35,7 +35,7 @@ EOF
 
 elif [ $(uname -m) == x86_64 ]; then
 	wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_amd64.deb
-	sha1sum -c <<< "ae1698a337689109582a1f318b641f4d3bb55282  libc6_2.15-0ubuntu10.5_amd64.deb" && \
+	echo 'ae1698a337689109582a1f318b641f4d3bb55282  libc6_2.15-0ubuntu10.5_amd64.deb' | sha1sum -c && \
   	dpkg -X libc6_2.15-0ubuntu10.5_amd64.deb libc6_2.15
   	cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
   	cat > /usr/bin/cb-steam <<'EOF'
