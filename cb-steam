@@ -5,10 +5,11 @@ if [ $(whoami) != root ]; then
   exit
 fi
 
-build() { 
-aptitude install zenity curl
 mkdir /tmp/cb-steam && cd /tmp/cb-steam
 mkdir /usr/local/lib/steam
+
+build() { 
+aptitude install zenity curl
 
 wget http://media.steampowered.com/client/installer/steam.deb
 echo 'f71400e63a5e3746c09b7c291d47244667a1b169  steam.deb' | sha1sum -c && \
