@@ -1,0 +1,162 @@
+#!/bin/bash
+#
+# surfplank - set default browser via MIME (Debian)
+#
+
+set -f # disable globbing if it is not needed
+
+if (( $UID == 0 )); then
+	echo "This script should not be run as root."
+	echo "See man xdg-mime."
+	exit 1
+fi
+
+spreq="xdg-utils libfile-mimeinfo-perl"
+
+if ! dpkg -l $spreq &>/dev/null; then
+	echo "Press "y" to install $spreq, or any other key to quit."
+	read -r -n1 q1
+	case "$q1" in
+		[yY])
+			sudo apt-get install $spreq || exit 1
+			;;
+		*)
+			exit
+			;;
+	esac
+fi
+
+# MIME types used by browsers.
+mimes=(\
+	x-scheme-handler/http \
+	x-scheme-handler/https \
+	x-scheme-handler/about \
+	x-scheme-handler/ftp \
+	x-scheme-handler/chrome \
+	x-scheme-handler/unknown \
+	application/x-extension-htm \
+	application/x-extension-html \
+	application/x-extension-shtml \
+	application/xhtml+xml \
+	application/x-extension-xhtml \
+	application/x-extension-xht \
+	text/html \
+)
+
+# xdg-mime can only reliably query one type at a time.
+spdefs=()
+for m in "${mimes[@]}" ; do
+	spdefs+=("$(xdg-mime query default $m)")
+done
+
+# Extra variables; adjust as needed.
+mime1=${mimes[0]}
+spdef1=${spdefs[0]}
+plank=${spdef1%.desktop}
+
+# Registered browsers in the MIME cache.
+# TODO: if $mime1 is empty, shift to $mimeX
+spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
+	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
+
+# Different DEs and browsers set different or insufficient MIME types,
+# so we compare them for consistency.
+compare() {
+	local st=0; local i=
+	for i in "${spdefs[@]}" ; do
+		[[ $spdef1 = $i ]]
+		st=$(( $? + st ))
+	done
+
+	if [[ $st = 0 ]]; then
+		# Matching MIME types - default browser set.
+		sperr=0
+	else
+		# Non-matching MIME types - default browser not set!
+		sperr=1
+	fi
+}
+
+surf() {
+	if [[ -d ~/.local/share/applications ]]; then
+		cd ~/.local/share/applications
+		cp mimeapps.list mimeapps.list.bak
+	else
+		mkdir -p ~/.local/share/applications
+	fi
+
+	xdg-mime default $spdef1 "${mimes[@]}"
+
+	# debian-sensible-browser takes $BROWSER (user setting) before
+	# x-www-browser (system setting), so we match the variable to
+	# our previous settings.
+	if ! grep ".bashrc.browser" ~/.bashrc --quiet; then
+		echo "source ~/.bashrc.browser" >> ~/.bashrc
+	fi
+
+	# FIXME: .desktop prefix may not match $PATH
+	echo "export BROWSER=$plank" > ~/.bashrc.browser
+
+	# Compare default to x-www-browser alternative. If sensible-browser or
+	# xdg-open are used, this is more informative than neccessary.
+	echo "The system browser is set to:"
+	update-alternatives --query x-www-browser | grep -e Name -e Status -e Value
+	echo ""
+	echo "The user browser is set to:"
+	echo "$plank"
+	echo ""
+	echo "The system browser may be configured with:"
+	echo "# update-alternatives --config x-www-browser"
+	echo "In most cases this is not necessary."
+}
+
+clean() {
+	# TODO: Remove ~/.local/share/applications/browser*.desktop?
+	:
+}
+
+change() {
+	echo "Choose the default browser"
+	select plank in "${spstore[@]}"; do
+		spdef1=$plank.desktop
+		break
+	done
+}
+
+# =====
+compare
+# =====
+
+if [[ $sperr = 0 ]]; then
+	echo "The default browser is $plank."
+	echo 'Press "c" to change, or any other key to quit.'
+	read -r -n1 q2
+	echo ""
+
+	case "$q2" in
+		[cC])
+			change && surf
+			;;
+		*)
+			exit
+			;;
+	esac
+
+else
+	echo "The default browser is $plank, but is not set correctly."
+	echo 'Press "y" to correct, "c" to change, or any other key to quit.'
+	read -r -n1 q3
+	echo ""
+
+	case "$q3" in
+		[yY])
+			surf
+			;;
+		[cC])
+			change && surf
+			;;
+		*)
+			exit
+			;;
+	esac
+fi
