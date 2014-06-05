@@ -25,7 +25,8 @@ fi
 function menu_common()
 {
 	cat << EOF > $tmpdir/dialog
---backtitle "dotpac $version - helps you get rid of /etc/*.pac* files, by swiergot@gmail.com"
+--backtitle "dotpac $version - helps you get rid of /etc/*.pac* files, \
+by swiergot@gmail.com"
 --no-shadow
 --begin $1 $2
 EOF
@@ -57,7 +58,8 @@ EOF
 	menu_common 3 15
 	cat << EOF >> $tmpdir/dialog
 --ok-label "Next"
---menu "The following backup files have been found in your /etc directory. Please select a file you want to process."
+--menu "The following backup files have been found in your /etc directory. \
+Please select a file you want to process."
 20 50 11
 EOF
 
@@ -99,7 +101,8 @@ EOF
 		menu_common 6 12
 		cat << EOF >> $tmpdir/dialog
 --ok-label "Finish"
---menu "Now that you know why $1 was left and you have seen the differences between the two files, you can decide what to do with them. What would you like to do?"
+--menu "Now that you know why $1 was left and you have seen the differences \
+between the two files, you can decide what to do with them. What would you like to do?"
 15 56 5
 1 "Remove the $3 file."
 2 "Remove the $3 file and edit the $4 one."
@@ -134,7 +137,8 @@ EOF
 	else
 		menu_common 8 15
 		cat << EOF >> $tmpdir/dialog
---yesno "Both files:\n\n  $2\n  $1\n\nare exactly the same. It is safe to remove the latter. Do you want to do this?"
+--yesno "Both files:\n\n  $2\n  $1\n\nare exactly the same. It is safe to remove \
+the latter. Do you want to do this?"
 11 50
 EOF
 
@@ -155,7 +159,9 @@ function menu_pacnew()
 	menu_common 9 3
 	cat << EOF >> $tmpdir/dialog
 --ok-label "Next"
---msgbox "During the last upgrade of a package that owns $file, pacman did not touch the file because it had been marked as NoUpgrade in /etc/pacman.conf.\n\nDifferences between both files will now be displayed."
+--msgbox "During the last upgrade of a package that owns $file, pacman did not \
+touch the file because it had been marked as NoUpgrade in /etc/pacman.conf. \
+\n\nDifferences between both files will now be displayed."
 9 74
 EOF
 
@@ -172,7 +178,11 @@ function menu_pacsave()
 		menu_common 7 3
 		cat << EOF >> $tmpdir/dialog
 --ok-label "Next"
---msgbox "During the last upgrade of a package that owns $file, the file was backed up as $1 and replaced with a new one. The new file differs from its previous original version that you had modified. You need to make your changes again, taking these differences into account.\n\nDifferences between both files will now be displayed."
+--msgbox "During the last upgrade of a package that owns $file, the file was \
+backed up as $1 and replaced with a new one. The new file differs from its \
+previous original version that you had modified. You need to make your changes \
+again, taking these differences into account.\n\nDifferences between both files \
+will now be displayed."
 12 74
 EOF
 
@@ -183,7 +193,8 @@ EOF
 		menu_common 9 3
 		cat << EOF >> $tmpdir/dialog
 --ok-label "Next"
---msgbox "Since $1 has not been found, it can be assumed that $file was created during removal of a package that owned the original file."
+--msgbox "Since $1 has not been found, it can be assumed that $file was created \
+during removal of a package that owned the original file."
 8 74
 EOF
 
@@ -200,7 +211,8 @@ EOF
 
 		menu_common 9 15
 		cat << EOF >> $tmpdir/dialog
---yesno "You can safely remove $1 if you are sure you will not need it anymore. Do you want to do this?"
+--yesno "You can safely remove $1 if you are sure you will not need it anymore. \
+Do you want to do this?"
 8 50
 EOF
 
@@ -223,3 +235,4 @@ done
 
 rm -rf $tmpdir
 clear
+
