@@ -22,8 +22,7 @@ if [ ! -x "$texted" ]; then
 	exit 2
 fi
 
-function menu_common()
-{
+menu_common() {
 	cat << EOF > $tmpdir/dialog
 --backtitle "dotpac $version - helps you get rid of /etc/*.pac* files, \
 by swiergot@gmail.com"
@@ -32,13 +31,12 @@ by swiergot@gmail.com"
 EOF
 }
 
-function menu_main()
-{
+menu_main() {
 	rm -f $tmpdir/files
 
 	i=1
 
-	for cf in `find /etc -name '*.pac*' | sort`; do
+	for cf in `find /etc /boot -name '*.pac*' | sort`; do
 		echo "$i $cf" >> $tmpdir/files
 		i=`expr $i + 1`
 	done
@@ -47,7 +45,7 @@ function menu_main()
 		menu_common 10 10
 		cat << EOF >> $tmpdir/dialog
 --ok-label "Exit"
---msgbox "No *.pac* files have been found in the /etc directory."
+--msgbox "No *.pac* files have been found in /etc and /boot."
 5 60
 EOF
 
@@ -58,7 +56,7 @@ EOF
 	menu_common 3 15
 	cat << EOF >> $tmpdir/dialog
 --ok-label "Next"
---menu "The following backup files have been found in your /etc directory. \
+--menu "The following backup files have been found in /etc and /boot. \
 Please select a file you want to process."
 20 50 11
 EOF
@@ -84,9 +82,8 @@ EOF
 	fi
 }
 
-function menu_actions()
-{
-	diff -u "$1" "$2" > $tmpdir/diff
+menu_actions() {
+	diff -u "$2" "$1" > $tmpdir/diff
 
 	if [ -s $tmpdir/diff ]; then
 		menu_common 3 1
@@ -152,8 +149,7 @@ EOF
 	fi
 }
 
-function menu_pacnew()
-{
+menu_pacnew() {
 	file=`dirname "$1"`/`basename "$1" .pacnew`
 
 	menu_common 9 3
@@ -170,8 +166,7 @@ EOF
 	menu_actions "$1" "$file" "new" "old" "new one"
 }
 
-function menu_pacsave()
-{
+menu_pacsave() {
 	file=`dirname "$1"`/`basename "$1" .pacsave`
 
 	if [ -f "$file" ]; then
@@ -235,4 +230,3 @@ done
 
 rm -rf $tmpdir
 clear
-
