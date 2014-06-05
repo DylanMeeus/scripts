@@ -2,7 +2,7 @@
 
 version="0.1"
 
-tmpdir=`mktemp -d 2> /dev/null`
+tmpdir=$(mktemp -d 2> /dev/null)
 
 if [ $? != 0 ]; then
 	echo "Unable to create a temporary directory." 1>&2
@@ -10,7 +10,7 @@ if [ $? != 0 ]; then
 fi
 
 for e in "$EDITOR" "$VISUAL" vim vi joe mcedit nano pico e3 jed ne emacs; do
-	w=`which $e 2> /dev/null`
+	w=$(which $e 2> /dev/null)
 	if [ -n "$w" -a -x "$w" ]; then
 		texted="$w"
 		break
@@ -36,9 +36,9 @@ menu_main() {
 
 	i=1
 
-	for cf in `find /etc /boot -name '*.pac*' | sort`; do
+	for cf in $(find /etc /boot -name '*.pac*' | sort); do
 		echo "$i $cf" >> $tmpdir/files
-		i=`expr $i + 1`
+		i=$(expr $i + 1)
 	done
 
 	if [ ! -s $tmpdir/files ]; then
@@ -68,9 +68,9 @@ EOF
 		return 1
 	fi
 
-	choice=`cat $tmpdir/exitcode`
-	choice=`expr $choice + 6`
-	file=`sed -n ${choice}p $tmpdir/dialog | cut -d ' ' -f 2`
+	choice=$(cat $tmpdir/exitcode)
+	choice=$(expr $choice + 6)
+	file=$(sed -n ${choice}p $tmpdir/dialog | cut -d ' ' -f 2)
 
 	if [[ "$file" == *.pacnew ]]; then
 		menu_pacnew "$file"
@@ -114,7 +114,7 @@ EOF
 			return 0
 		fi
 
-		choice=`cat $tmpdir/exitcode`
+		choice=$(cat $tmpdir/exitcode)
 
 		if [ $choice == 5 ]; then
 			return 0
@@ -150,7 +150,7 @@ EOF
 }
 
 menu_pacnew() {
-	file=`dirname "$1"`/`basename "$1" .pacnew`
+	file=$(dirname "$1")/$(basename "$1" .pacnew)
 
 	menu_common 9 3
 	cat << EOF >> $tmpdir/dialog
@@ -167,7 +167,7 @@ EOF
 }
 
 menu_pacsave() {
-	file=`dirname "$1"`/`basename "$1" .pacsave`
+	file=$(dirname "$1")/$(basename "$1" .pacsave)
 
 	if [ -f "$file" ]; then
 		menu_common 7 3
