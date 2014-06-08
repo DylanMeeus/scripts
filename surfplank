@@ -46,7 +46,8 @@ mimes=(\
 # xdg-mime can only reliably query one type at a time.
 spdefs=()
 for m in "${mimes[@]}" ; do
-	# Quoting! Otherwise blank elements are not included.
+	# Quoting! Otherwise blank elements are not included, \
+	thus not matching select in base().
 	spdefs+=("$(xdg-mime query default $m)")
 done
 
@@ -79,13 +80,18 @@ compare() {
 }
 
 surf() {
+	# xdg-mime fails without the right path
 	if [[ -d ~/.local/share/applications ]]; then
 		cd ~/.local/share/applications
-		cp mimeapps.list mimeapps.list.bak
+		# Only copy something that's there
+		if [[ -a mimeapps.list ]]; then
+			cp mimeapps.list mimeapps.list.bak
+		fi
 	else
 		mkdir -p ~/.local/share/applications
 	fi
-
+	
+	# Match the base MIME type 
 	xdg-mime default $spdef1 "${mimes[@]}"
 
 	# debian-sensible-browser takes $BROWSER (user setting) before
