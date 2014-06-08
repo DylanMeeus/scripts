@@ -26,7 +26,7 @@ if ! dpkg -l $spreq &>/dev/null; then
 	esac
 fi
 
-# MIME types used by browsers.
+# MIME types used by browsers. Adjust as needed.
 mimes=(\
 	x-scheme-handler/http \
 	x-scheme-handler/https \
@@ -50,24 +50,22 @@ for m in "${mimes[@]}" ; do
 	spdefs+=("$(xdg-mime query default $m)")
 done
 
-# select() is rather limited here
-echo "Choose the base MIME type."
-select mime1 in "${mimes[@]}"; do
-	spdef1="${spdefs[$REPLY]}"
-	break
-done
-
-plank=${spdef1%.desktop}
-
-# Registered browsers in the MIME cache.
-spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
-	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
+# Functions
+base() {
+	# select() is rather limited here
+	echo "Choose the base MIME type to compare against:"
+	select mime1 in "${mimes[@]}"; do
+		spdef1="${spdefs[$REPLY]}"
+		break
+	done
+	plank=${spdef1%.desktop}
+}
 
 # Different DEs and browsers set different or insufficient MIME types,
 # so we compare them for consistency.
 compare() {
 	local st=0; local i=
-	for i in "${spdefs[@]}" ; do
+	for i in "${spdefs[@]}"; do
 		[[ $spdef1 = $i ]]
 		st=$(( $? + st ))
 	done
@@ -126,6 +124,20 @@ change() {
 		break
 	done
 }
+
+# ==
+base
+# ==
+
+# Registered browsers in the MIME cache.
+spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
+	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
+	
+while [[ $spstore == "" ]]; do
+	echo "This type is not yet registered to any browser."
+	echo -e "Choose a different one.\n"
+	base
+done
 
 # =====
 compare
