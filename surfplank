@@ -46,10 +46,12 @@ mimes=(\
 # xdg-mime can only reliably query one type at a time.
 spdefs=()
 for m in "${mimes[@]}" ; do
+	# Quoting! Otherwise blank elements are not included.
 	spdefs+=("$(xdg-mime query default $m)")
 done
 
-# Select MIME types
+# select() is rather limited here
+echo "Choose the base MIME type."
 select mime1 in "${mimes[@]}"; do
 	spdef1="${spdefs[$REPLY]}"
 	break
@@ -58,7 +60,6 @@ done
 plank=${spdef1%.desktop}
 
 # Registered browsers in the MIME cache.
-# TODO: if $mime1 is empty, shift to $mimeX
 spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
 
