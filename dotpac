@@ -1,12 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
-version="0.1"
+version="0.3"
 
-tmpdir=$(mktemp -d 2> /dev/null)
-
-if [ $? != 0 ]; then
-	echo "Unable to create a temporary directory." 1>&2
-	exit 1
+if ! which dialog > /dev/null 2>&1; then
+	echo "Could not find dialog, do 'pacman -S dialog'." 1>&2
+	exit 4
 fi
 
 for e in "$EDITOR" "$VISUAL" vim vi joe mcedit nano pico e3 jed ne emacs; do
@@ -22,9 +20,15 @@ if [ ! -x "$texted" ]; then
 	exit 2
 fi
 
+tmpdir=`mktemp -d 2> /dev/null`
+if [ $? != 0 ]; then
+	echo "Unable to create a temporary directory." 1>&2
+	exit 1
+fi
+
 menu_common() {
 	cat << EOF > $tmpdir/dialog
---backtitle "dotpac $version - helps you get rid of /etc/*.pac* files, \
+--backtitle "dotpac $version - get rid of /{boot,etc}/*.pac* files, \
 by swiergot@gmail.com"
 --no-shadow
 --begin $1 $2
@@ -42,11 +46,11 @@ menu_main() {
 	done
 
 	if [ ! -s $tmpdir/files ]; then
-		menu_common 10 10
+		menu_common 10 5
 		cat << EOF >> $tmpdir/dialog
 --ok-label "Exit"
 --msgbox "No *.pac* files have been found in /etc and /boot."
-5 60
+5 70
 EOF
 
 		dialog --file $tmpdir/dialog
