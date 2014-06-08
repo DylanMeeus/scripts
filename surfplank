@@ -49,9 +49,12 @@ for m in "${mimes[@]}" ; do
 	spdefs+=("$(xdg-mime query default $m)")
 done
 
-# Extra variables; adjust as needed.
-mime1=${mimes[0]}
-spdef1=${spdefs[0]}
+# Select MIME types
+select mime1 in "${mimes[@]}"; do
+	spdef1="${spdefs[$REPLY]}"
+	break
+done
+
 plank=${spdef1%.desktop}
 
 # Registered browsers in the MIME cache.
