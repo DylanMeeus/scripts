@@ -50,7 +50,6 @@ for m in "${mimes[@]}" ; do
 	spdefs+=("$(xdg-mime query default $m)")
 done
 
-# Functions
 base() {
 	# select() is rather limited here
 	echo "Choose the base MIME type to compare against:"
@@ -92,6 +91,7 @@ surf() {
 	# debian-sensible-browser takes $BROWSER (user setting) before
 	# x-www-browser (system setting), so we match the variable to
 	# our previous settings.
+	# FIXME: sensible-browser may ignore this variable
 	if ! grep ".bashrc.browser" ~/.bashrc --quiet; then
 		echo "source ~/.bashrc.browser" >> ~/.bashrc
 	fi
@@ -109,7 +109,7 @@ surf() {
 	echo ""
 	echo "The system browser may be configured with:"
 	echo "# update-alternatives --config x-www-browser"
-	echo "In most cases this is not necessary."
+	echo "In most cases this is unnecessary."
 }
 
 clean() {
