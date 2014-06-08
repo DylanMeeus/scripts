@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="0.3"
+version="0.4"
 
 if ! which dialog > /dev/null 2>&1; then
 	echo "Could not find dialog, do 'pacman -S dialog'." 1>&2
