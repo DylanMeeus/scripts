@@ -57,13 +57,13 @@ base() {
 	# TODO: Allow to exclude certain types
 	echo "Choose the base MIME type to compare against:"
 	select mime1 in "${mimes[@]}"; do
-		spdef1="${spdefs[$REPLY]}"
+		n=1; spdef1="${spdefs[(($REPLY-$n))]}"
 		break
 	done
 	plank=${spdef1%.desktop}
 
-	# Registered browsers in the MIME cache.
-	# FIXME: disregards user settings (including this script)
+	# Registered browsers in the (system) MIME cache.
+	# TODO: User cache may be broken
 	spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
 }
