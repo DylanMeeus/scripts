@@ -3,7 +3,8 @@
 # surfplank - set default browser via MIME (Debian)
 #
 
-set -f # disable globbing if it is not needed
+# Disable globbing if it is not needed.
+set -f 
 
 if (( $UID == 0 )); then
 	echo "This script should not be run as root."
@@ -45,20 +46,26 @@ mimes=(\
 
 # xdg-mime can only reliably query one type at a time.
 spdefs=()
-for m in "${mimes[@]}" ; do
-	# Quoting! Otherwise blank elements are not included, \
-	thus not matching select in base().
+for m in "${mimes[@]}"; do
+	# Quoting! Otherwise blank elements are disregarded,
+	# thus not matching select() in base().
 	spdefs+=("$(xdg-mime query default $m)")
 done
 
 base() {
-	# select() is rather limited here
+	# select() is rather limited here.
+	# TODO: Allow to exclude certain types
 	echo "Choose the base MIME type to compare against:"
 	select mime1 in "${mimes[@]}"; do
 		spdef1="${spdefs[$REPLY]}"
 		break
 	done
 	plank=${spdef1%.desktop}
+
+	# Registered browsers in the MIME cache.
+	# FIXME: disregards user settings (including this script)
+	spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
+	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
 }
 
 # Different DEs and browsers set different or insufficient MIME types,
@@ -80,18 +87,18 @@ compare() {
 }
 
 surf() {
-	# xdg-mime fails without the right path
+	# xdg-mime fails if this directory does not exist
 	if [[ -d ~/.local/share/applications ]]; then
 		cd ~/.local/share/applications
-		# Only copy something that's there
+		# Only copy what's actually there
 		if [[ -a mimeapps.list ]]; then
 			cp mimeapps.list mimeapps.list.bak
 		fi
 	else
 		mkdir -p ~/.local/share/applications
 	fi
-	
-	# Match the base MIME type 
+
+	# Match the base MIME type.
 	xdg-mime default $spdef1 "${mimes[@]}"
 
 	# debian-sensible-browser takes $BROWSER (user setting) before
@@ -108,11 +115,10 @@ surf() {
 	# Compare default to x-www-browser alternative. If sensible-browser or
 	# xdg-open are used, this is more informative than neccessary.
 	echo "The system browser is set to:"
-	update-alternatives --query x-www-browser | grep -e Name -e Status -e Value
-	echo ""
-	echo "The user browser is set to:"
-	echo "$plank"
-	echo ""
+	update-alternatives --query x-www-browser \
+	| grep -e Name -e Status -e Value
+	echo -e "\nThe user browser is set to:"
+	echo -e "$plank\n"
 	echo "The system browser may be configured with:"
 	echo "# update-alternatives --config x-www-browser"
 	echo "In most cases this is unnecessary."
@@ -135,10 +141,9 @@ change() {
 base
 # ==
 
-# Registered browsers in the MIME cache.
-spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
-	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
-	
+# TODO: In base(), you could use shift() instead of select() for 
+# automatic checks. At least, if you then prevent it from setting 
+# your FTP client or editor as default "browser" ...
 while [[ $spstore == "" ]]; do
 	echo "This type is not yet registered to any browser."
 	echo -e "Choose a different one.\n"
@@ -150,10 +155,9 @@ compare
 # =====
 
 if [[ $sperr = 0 ]]; then
-	echo "The default browser is $plank."
-	echo 'Press "c" to change, or any other key to quit.'
+	echo "The registered browser is $plank."
+	echo -e 'Press "c" to change, or any other key to quit.\n'
 	read -r -n1 q2
-	echo ""
 
 	case "$q2" in
 		[cC])
@@ -165,10 +169,11 @@ if [[ $sperr = 0 ]]; then
 	esac
 
 else
-	echo "The default browser is $plank, but is not set correctly."
-	echo 'Press "y" to correct, "c" to change, or any other key to quit.'
+	echo "The registered browser is $plank, but is not set consistently \
+	across MIME types."
+	echo -e 'Press "y" to correct, "c" to change, \
+	or any other key to quit.\n'
 	read -r -n1 q3
-	echo ""
 
 	case "$q3" in
 		[yY])
