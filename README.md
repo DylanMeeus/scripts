@@ -1,7 +1,5 @@
 cb-steam:
 
-Steam for Debian 7-based distributions.
-
 http://crunchbang.org/forums/viewtopic.php?id=24711&p=1
 http://crunchbang.org/forums/viewtopic.php?id=33349
 
@@ -18,3 +16,9 @@ If you get a checksum error, then Steam was likely updated. Open an issue or rem
 cb-exit
 
 See: http://crunchbang.org/forums/viewtopic.php?pid=369356#p369356
+
+----
+
+surfplank
+
+Set or repair the default browser.
