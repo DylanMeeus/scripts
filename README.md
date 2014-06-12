@@ -1,27 +1,27 @@
-cb-steam:
+*cb-steam*
 
 Steam installer for Debian 7 & friends.
 
 ----
 
-cb-exit
+*cb-exit*
 
 See: http://crunchbang.org/forums/viewtopic.php?pid=369356#p369356
 
 ----
 
-surfplank
+*surfplank*
 
 Set or repair the default browser.
 
 ----
 
-cuppa
+*cuppa*
 
-Simple CUPS support.
+Simple Debian CUPS support.
 
 ----
 
-dotpac
+*dotpac*
 
 Slightly modified version of: https://wiki.archlinux.org/index.php/Dotpac
