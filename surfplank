@@ -44,26 +44,19 @@ mimes=(\
 	text/html \
 )
 
-# xdg-mime can only reliably query one type at a time.
-spdefs=()
-for m in "${mimes[@]}"; do
-	# Quoting! Otherwise blank elements are disregarded,
-	# thus not matching select() in base().
-	spdefs+=("$(xdg-mime query default $m)")
-done
-
 base() {
 	# select() is rather limited here.
 	# TODO: Allow to exclude certain types
 	echo "Choose the base MIME type to compare against:"
 	select mime1 in "${mimes[@]}"; do
-		n=1; spdef1="${spdefs[(($REPLY-$n))]}"
+		#n=1; spdef1="${spdefs[(($REPLY-$n))]}"
+		spdef1="$(xdg-mime query default $mime1)"
 		break
 	done
 	plank=${spdef1%.desktop}
 
 	# Registered browsers in the (system) MIME cache.
-	# TODO: User cache may be broken
+	# TODO: +User cache -> accurate?
 	spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
 }
@@ -148,6 +141,14 @@ while [[ $spstore == "" ]]; do
 	echo "This type is not yet registered to any browser."
 	echo -e "Choose a different one.\n"
 	base
+done
+
+# xdg-mime can only reliably query one type at a time.
+spdefs=()
+for m in "${mimes[@]}"; do
+	# Quoting! Otherwise blank elements are disregarded,
+	# thus not matching select() in base().
+	spdefs+=("$(xdg-mime query default $m)")
 done
 
 # =====
