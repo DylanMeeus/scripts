@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ $(whoami) != root ]; then
+if [ $(id -u) != 0 ]; then
   echo "Please run this script as root or using sudo"
   exit
 fi
@@ -9,8 +9,10 @@ mkdir /tmp/cb-steam && cd /tmp/cb-steam
 mkdir /usr/local/lib/steam
 
 build() { 
-aptitude install zenity curl
+apt-get install zenity curl
 
+# If you get a checksum error, then Steam was likely updated. 
+# Open an issue or comment out the offending sha1sum line.
 wget http://media.steampowered.com/client/installer/steam.deb
 echo 'f71400e63a5e3746c09b7c291d47244667a1b169  steam.deb' | sha1sum -c && \
 dpkg -X steam.deb cb-steam && dpkg -e steam.deb cb-steam/DEBIAN
@@ -48,6 +50,8 @@ EOF
 fi
 }
 
+# LC_ALL=C is only supported by Steam as "fallback", which may cause some games to fail. 
+# This function correctly installs the US locale if not present.
 locale() { 
 if grep -Fxq '# en_US.UTF-8 UTF-8' /etc/locale.gen; then 
 	sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
