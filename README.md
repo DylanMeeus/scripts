@@ -12,7 +12,7 @@ See: http://crunchbang.org/forums/viewtopic.php?pid=369356#p369356
 
 *surfplank*
 
-Set or repair the default browser.
+Set or repair the default browser. See: http://crunchbang.org/forums/viewtopic.php?pid=380251#p380251
 
 ----
 
