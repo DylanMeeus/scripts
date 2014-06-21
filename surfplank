@@ -15,11 +15,14 @@ fi
 spreq="xdg-utils libfile-mimeinfo-perl"
 
 if ! dpkg -l $spreq &>/dev/null; then
-	echo "Press "y" to install $spreq, or any other key to quit."
+	echo "Press "y" to install $spreq, "i" to ignore, or any other key to quit."
 	read -r -n1 q1
 	case "$q1" in
 		[yY])
 			sudo apt-get install $spreq || exit 1
+			;;
+		[iI])
+			true
 			;;
 		*)
 			exit
@@ -49,14 +52,13 @@ base() {
 	# TODO: Allow to exclude certain types
 	echo "Choose the base MIME type to compare against:"
 	select mime1 in "${mimes[@]}"; do
-		#n=1; spdef1="${spdefs[(($REPLY-$n))]}"
 		spdef1="$(xdg-mime query default $mime1)"
 		break
 	done
 	plank=${spdef1%.desktop}
 
-	# Registered browsers in the (system) MIME cache.
-	# TODO: +User cache -> accurate?
+	# (system-wide) MIME cache.
+	# TODO: user cache
 	spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
 }
@@ -107,14 +109,16 @@ surf() {
 
 	# Compare default to x-www-browser alternative. If sensible-browser or
 	# xdg-open are used, this is more informative than neccessary.
-	echo "The system browser is set to:"
-	update-alternatives --query x-www-browser \
-	| grep -e Name -e Status -e Value
-	echo -e "\nThe user browser is set to:"
-	echo -e "$plank\n"
-	echo "The system browser may be configured with:"
-	echo "# update-alternatives --config x-www-browser"
-	echo "In most cases this is unnecessary."
+	if [[ -x /usr/bin/x-www-browser ]]; then
+		echo "The system browser is set to:"
+		update-alternatives --query x-www-browser \
+		| grep -e Name -e Status -e Value
+		echo -e "\nThe user browser is set to:"
+		echo -e "$plank\n"
+		echo "The system browser may be configured with:"
+		echo "# update-alternatives --config x-www-browser"
+		echo "In most cases this is unnecessary."
+	fi
 }
 
 clean() {
@@ -137,8 +141,8 @@ base
 # TODO: In base(), you could use shift() instead of select() for 
 # automatic checks. At least, if you then prevent it from setting 
 # your FTP client or editor as default "browser" ...
-while [[ $spstore == "" ]]; do
-	echo "This type is not yet registered to any browser."
+while [[ $spdef1 == "" ]]; do
+	echo "This type is not yet registered."
 	echo -e "Choose a different one.\n"
 	base
 done
@@ -171,9 +175,9 @@ if [[ $sperr = 0 ]]; then
 
 else
 	echo "The registered browser is $plank, but is not set consistently \
-	across MIME types."
+across MIME types."
 	echo -e 'Press "y" to correct, "c" to change, \
-	or any other key to quit.\n'
+or any other key to quit.\n'
 	read -r -n1 q3
 
 	case "$q3" in
