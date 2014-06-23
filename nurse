@@ -15,7 +15,7 @@ source="http://ftp.de.debian.org/debian/pool/main/$pool/$pkg/${pkg}_$ver-$rel.ds
 patch="https://bugs.debian.org/cgi-bin/bugreport.cgi?msg=25;filename=gtk3_disable_csd_envvar.patch;att=1;bug=744249"
 
 depends() {
-	sudo apt-get install quilt debian-archive-keyring devscripts curl
+	sudo apt-get install quilt debian-keyring devscripts curl
 	sudo apt-get build-dep $pkg
 }
 
