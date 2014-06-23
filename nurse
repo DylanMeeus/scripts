@@ -7,7 +7,7 @@ if (( $UID == 0 )); then
 fi
 
 pkg=gtk+3.0
-pool=$pkg | cut -c 1
+pool=$(echo $pkg | cut -c 1)
 ver=3.12.2
 rel=1
 dist=unstable
