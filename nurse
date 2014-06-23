@@ -2,7 +2,7 @@
 # nurse - Automatically patch Debian packages
 
 if (( $UID == 0 )); then
-	echo "Y U BUILD R00T"
+	echo "Don't build as root, handsome"
 	exit 1
 fi
 
@@ -20,7 +20,7 @@ depends() {
 }
 
 prepare() {
-	dget -u $source || exit 1
+	dget $source || exit 1
 	pushd "$pkg-$ver"
 	test -d debian/patches || mkdir -p debian/patches
 	pushd debian/patches
@@ -31,7 +31,7 @@ prepare() {
 
 build() {	
 	dch --local +bbq --distribution $dist "Little GNOMEs in space."
-	dpkg-buildpackage -us -uc -d
+	dpkg-buildpackage -us -uc
 }
 
 clean() {
