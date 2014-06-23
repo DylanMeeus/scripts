@@ -16,8 +16,8 @@ source=http://ftp.de.debian.org/debian/pool/main/$pool/$pkg_$ver-$rel.dsc
 patch="https://bugs.debian.org/cgi-bin/bugreport.cgi?msg=25;filename=gtk3_disable_csd_envvar.patch;att=1;bug=744249"
 
 if ! dpkg -l $prep &>/dev/null; then
-	sudo apt-get install $prep
-	sudo apt-get build-dep $pkg
+	sudo apt-get install $prep && \
+	sudo apt-get build-dep $pkg || exit 1
 fi
 
 prepare() {
