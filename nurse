@@ -11,7 +11,7 @@ pool=$pkg | cut -c 1
 ver=3.12.2
 rel=1
 dist=unstable
-prep=('quilt debian-archive-keyring devscripts curl')
+prep=('quilt debian-keyring devscripts curl')
 source=http://ftp.de.debian.org/debian/pool/main/$pool/$pkg_$ver-$rel.dsc
 patch="https://bugs.debian.org/cgi-bin/bugreport.cgi?msg=25;filename=gtk3_disable_csd_envvar.patch;att=1;bug=744249"
 
