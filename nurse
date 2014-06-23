@@ -21,18 +21,19 @@ if ! dpkg -l $prep &>/dev/null; then
 fi
 
 prepare() {
-	dget $source || exit 1
+	dget -u $source || exit 1
 	pushd "$pkg-$ver"
 	test -d debian/patches || mkdir -p debian/patches
 	pushd debian/patches
 	curl -Lo meds.patch "$patch"
 	quilt import meds.patch
 	popd && quilt push -a
+	return 0
 }
 
 build() {	
 	dch --local +bbq --distribution $dist "Little GNOMEs in space."
-	dpkg-buildpackage -us -uc
+	dpkg-buildpackage -us -uc -d
 }
 
 clean() {
@@ -41,7 +42,13 @@ clean() {
 	| xargs sudo apt-get purge
 }
 
-prepare && build && \
+prepare
+if [[ $? -eq 0 || $? -eq 2 ]]; then
+	build
+else
+	echo "I couldn't cure you."
+fi
+
 read -r -p "Remove build dependencies? [y/n]" OPTION
 case $OPTION in
 	[yY])
