@@ -28,7 +28,6 @@ prepare() {
 	curl -Lo meds.patch "$patch"
 	quilt import meds.patch
 	popd && quilt push -a
-	return 0
 }
 
 build() {	
