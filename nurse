@@ -6,6 +6,8 @@ if (( $UID == 0 )); then
 	exit 1
 fi
 
+sudo apt-get install quilt debian-keyring devscripts curl fakeroot libdistro-info-perl
+
 pkg=gtk+3.0
 ver=3.12.2
 rel=1
@@ -14,9 +16,10 @@ pool=$(echo $pkg | cut -c 1)
 source="http://ftp.de.debian.org/debian/pool/main/$pool/$pkg/${pkg}_$ver-$rel.dsc"
 patch="https://bugs.debian.org/cgi-bin/bugreport.cgi?msg=25;filename=gtk3_disable_csd_envvar.patch;att=1;bug=744249"
 
-depends() {
-	sudo apt-get install quilt debian-keyring devscripts curl fakeroot libdistro-info-perl
+depends() {	
 	sudo apt-get build-dep $pkg
+	deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
+	| sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
 }
 
 prepare() {
@@ -26,7 +29,7 @@ prepare() {
 	pushd debian/patches
 	curl -Lo meds.patch "$patch"
 	quilt import meds.patch
-	popd && quilt push -a
+	popd
 }
 
 build() {	
@@ -38,10 +41,7 @@ clean() {
 	read -r -p "Remove build dependencies? [y/n]" OPTION
 	case $OPTION in
 		[yY])
-			echo "Check and double-check before confirming."
-			tac /var/log/apt/history.log | grep -m1 Install \
-			| sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||" \
-			| xargs sudo apt-get purge
+			apt-get purge "$deplist"
 			;;
 		[nN])
 			exit
