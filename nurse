@@ -2,12 +2,14 @@
 # nurse - Automatically patch Debian packages
 
 if (( $UID == 0 )); then
-	echo "Don't build as root, handsome"
+	echo "Don't build as root, handsome."
 	exit 1
 fi
 
+# Build tools
 sudo apt-get install quilt debian-keyring devscripts curl fakeroot libdistro-info-perl
 
+# Package variables
 pkg=gtk+3.0
 ver=3.12.2
 rel=1
@@ -37,27 +39,29 @@ build() {
 	dpkg-buildpackage -us -uc
 }
 
-clean() {
-	read -r -p "Remove build dependencies? [y/n]" OPTION
-	case $OPTION in
-		[yY])
-			apt-get purge "$deplist"
-			;;
-		[nN])
-			exit
-			;;
-	esac
-}
-
+# ================
 depends && prepare
+# ================
 
-if [[ $? -eq 0 ]]; then
-	build
-elif [[ $? -eq 2 ]]; then
-	build
-else
-	echo "I couldn't cure you."
-fi
+case "$?" in
+	0)
+		build
+		;;
+	2)
+		build
+		;;
+	*)
+		echo "I couldn't cure you."
+		;;
+esac
 
+read -r -p "Remove build dependencies? [y/n]" OPTION
+case $OPTION in
+	[yY])
+		apt-get purge "$deplist"
+		;;
+	[nN])
+		exit
+		;;
+esac
 rm -r "$pkg-$ver"
-clean
