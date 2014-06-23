@@ -14,8 +14,10 @@ dist=unstable
 source="http://ftp.de.debian.org/debian/pool/main/$pool/$pkg/${pkg}_$ver-$rel.dsc"
 patch="https://bugs.debian.org/cgi-bin/bugreport.cgi?msg=25;filename=gtk3_disable_csd_envvar.patch;att=1;bug=744249"
 
-sudo apt-get install quilt debian-archive-keyring devscripts curl
-sudo apt-get build-dep $pkg
+depends() {
+	sudo apt-get install quilt debian-archive-keyring devscripts curl
+	sudo apt-get build-dep $pkg
+}
 
 prepare() {
 	dget -u $source || exit 1
@@ -47,12 +49,12 @@ clean() {
 	esac
 }
 
-prepare
+depends && prepare
 
 if [[ $? -eq 0 || $? -eq 2 ]]; then
 	build
+	clean
 else
 	echo "I couldn't cure you."
+	clean
 fi
-
-clean
