@@ -2,7 +2,7 @@
 # nurse - Automatically patch Debian packages
 
 if (( $UID == 0 )); then
-	echo "Y U BUILD R00T"
+	echo "Don't build as root, handsome."
 	exit 1
 fi
 
