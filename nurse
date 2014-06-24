@@ -36,9 +36,8 @@ prepare() {
 	# quilt doesn't work properly if a patch of the same name is already present
 	# in that directory.
 	# cd debian/patches
-	curl -Lo 099_meds.patch "$patch"
-	quilt import 099_meds.patch
-	rm 099_meds.patch
+	curl -Lo /tmp/099_meds.patch "$patch"
+	quilt import /tmp/099_meds.patch
 }
 
 build() {	
