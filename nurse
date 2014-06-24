@@ -27,8 +27,9 @@ depends() {
 }
 
 prepare() {
+	# Listing all keys creates a GPG config if none was present (needed for dget)
 	gpg -k
-	dget -u $source
+	dget $source
 	cd "$pkg-$ver"
 	test -d debian/patches || mkdir -p debian/patches
 	# BUG: "Upstream changes" error if the patch is imported *from* debian/patches;
@@ -41,7 +42,7 @@ prepare() {
 
 build() {	
 	dch --local +bbq --distribution $dist "Just what the doctor ordered."
-	dpkg-buildpackage -us -uc -d
+	dpkg-buildpackage -us -uc
 }
 
 # ================
