@@ -35,6 +35,7 @@ prepare() {
 	# BUG: "Upstream changes" error if the patch is imported *from* debian/patches;
 	# quilt doesn't work properly if a patch of the same name is already present
 	# in that directory.
+	# cd debian/patches
 	curl -Lo 099_meds.patch "$patch"
 	quilt import 099_meds.patch
 	rm 099_meds.patch
