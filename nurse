@@ -24,8 +24,6 @@ depends() {
    # Born and raised in Chernobyl
    deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
    | sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
-
-   #tac /var/log/apt/history.log | awk '/^Install/ {print $2; exit}'
 }
 
 prepare() {
