@@ -1,41 +1,39 @@
 #!/bin/bash
 # nurse - Automatically patch Debian packages
 
-if (( $UID == 0 )); then
-   echo "Don't build as root, handsome."
-   exit 1
-fi
-
-# Build tools
-sudo apt-get install quilt debian-keyring devscripts curl fakeroot libdistro-info-perl
-
-# Package variables
+### BEGIN PKG INFO
 pkg=dwm
 ver=6.0
 rel=6
 dist=unstable
 pool=$(echo $pkg | cut -c 1)
-# ${pkg} due to underscore
 source="http://ftp.de.debian.org/debian/pool/main/$pool/$pkg/${pkg}_$ver-$rel.dsc"
 patch="http://dwm.suckless.org/patches/dwm-6.0-bstack.diff"
+### END PKG INFO
+
+if (( $UID == 0 )); then
+   echo "Don't build as root, handsome."
+   exit 1
+fi
+
+devel="quilt debian-keyring devscripts curl fakeroot libdistro-info-perl"
+sudo apt-get install "$devel"
 
 depends() {   
    sudo apt-get build-dep $pkg
    # Born and raised in Chernobyl
    deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
    | sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
+
+   #tac /var/log/apt/history.log | awk '/^Install/ {print $2; exit}'
 }
 
 prepare() {
-   # Listing all keys creates a GPG config if none was present (needed for dget)
-   gpg -k
+   gpg -k # Initialize GPG config
    dget $source
    cd "$pkg-$ver"
    test -d debian/patches || mkdir -p debian/patches
-   # BUG: "Upstream changes" error if the patch is imported *from* debian/patches;
-   # quilt doesn't work properly if a patch of the same name is already present
-   # in that directory.
-   # cd debian/patches
+   # https://bugs.debian.org/752624
    curl -Lo /tmp/099_meds.patch "$patch"
    quilt import /tmp/099_meds.patch
 }
