@@ -2,47 +2,47 @@
 # nurse - Automatically patch Debian packages
 
 if (( $UID == 0 )); then
-	echo "Don't build as root, handsome."
-	exit 1
+   echo "Don't build as root, handsome."
+   exit 1
 fi
 
 # Build tools
 sudo apt-get install quilt debian-keyring devscripts curl fakeroot libdistro-info-perl
 
 # Package variables
-pkg=gtk+3.0
-ver=3.12.2
-rel=1
+pkg=dwm
+ver=6.0
+rel=6
 dist=unstable
 pool=$(echo $pkg | cut -c 1)
 # ${pkg} due to underscore
 source="http://ftp.de.debian.org/debian/pool/main/$pool/$pkg/${pkg}_$ver-$rel.dsc"
-patch="https://bugs.debian.org/cgi-bin/bugreport.cgi?msg=25;filename=gtk3_disable_csd_envvar.patch;att=1;bug=744249"
+patch="http://dwm.suckless.org/patches/dwm-6.0-bstack.diff"
 
-depends() {	
-	sudo apt-get build-dep $pkg
-	# Born and raised in Chernobyl
-	deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
-	| sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
+depends() {   
+   sudo apt-get build-dep $pkg
+   # Born and raised in Chernobyl
+   deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
+   | sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
 }
 
 prepare() {
-	# Listing all keys creates a GPG config if none was present (needed for dget)
-	gpg -k
-	dget $source
-	cd "$pkg-$ver"
-	test -d debian/patches || mkdir -p debian/patches
-	# BUG: "Upstream changes" error if the patch is imported *from* debian/patches;
-	# quilt doesn't work properly if a patch of the same name is already present
-	# in that directory.
-	# cd debian/patches
-	curl -Lo /tmp/099_meds.patch "$patch"
-	quilt import /tmp/099_meds.patch
+   # Listing all keys creates a GPG config if none was present (needed for dget)
+   gpg -k
+   dget $source
+   cd "$pkg-$ver"
+   test -d debian/patches || mkdir -p debian/patches
+   # BUG: "Upstream changes" error if the patch is imported *from* debian/patches;
+   # quilt doesn't work properly if a patch of the same name is already present
+   # in that directory.
+   # cd debian/patches
+   curl -Lo /tmp/099_meds.patch "$patch"
+   quilt import /tmp/099_meds.patch
 }
 
-build() {	
-	dch --local +bbq --distribution $dist "Just what the doctor ordered."
-	dpkg-buildpackage -us -uc
+build() {   
+   dch --local +bbq --distribution $dist "Just what the doctor ordered."
+   dpkg-buildpackage -us -uc
 }
 
 # ================
@@ -50,24 +50,24 @@ depends && prepare
 # ================
 
 case "$?" in
-	0)
-		build
-		;;
-	2)
-		build
-		;;
-	*)
-		echo "I couldn't cure you."
-		exit 69
-		;;
+   0)
+      build
+      ;;
+   2)
+      build
+      ;;
+   *)
+      echo "I couldn't cure you."
+      exit 69
+      ;;
 esac
 
 read -rp "Remove build dependencies? [y/n]" OPTION
 case $OPTION in
-	[yY])
-		apt-get purge ${deplist[@]}
-		;;
-	[nN])
-		exit
-		;;
+   [yY])
+      apt-get purge ${deplist[@]}
+      ;;
+   [nN])
+      exit
+      ;;
 esac

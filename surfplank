@@ -174,10 +174,8 @@ if [[ $sperr = 0 ]]; then
 	esac
 
 else
-	echo "The registered browser is $plank, but is not set consistently \
-across MIME types."
-	echo -e 'Press "y" to correct, "c" to change, \
-or any other key to quit.\n'
+	echo "The registered browser is $plank, but is not set consistently across MIME types."
+	echo -e 'Press "y" to correct, "c" to change, or any other key to quit.\n'
 	read -r -n1 q3
 
 	case "$q3" in
