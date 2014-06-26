@@ -8,13 +8,18 @@ fi
 mkdir /tmp/cb-steam && cd /tmp/cb-steam
 mkdir /usr/local/lib/steam
 
-build() { 
+build() {
 apt-get install zenity curl
+if [ $(uname -m) == x86_64 ]; then
+	dpkg --add-architecture i386
+	apt-get update
+fi
+
 
 # If you get a checksum error, then Steam was likely updated. 
 # Open an issue or comment out the offending sha1sum line.
 wget http://media.steampowered.com/client/installer/steam.deb
-echo 'f71400e63a5e3746c09b7c291d47244667a1b169  steam.deb' | sha1sum -c && \
+echo '8d266e853756a23ed848ed03fadf6a4e1dec6e3f  steam.deb' | sha1sum -c && \
 dpkg -X steam.deb cb-steam && dpkg -e steam.deb cb-steam/DEBIAN
 sed -i 's/2.15/2.13/g' cb-steam/DEBIAN/control || exit
 dpkg -b cb-steam cb-steam.deb
