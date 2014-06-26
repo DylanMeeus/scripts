@@ -15,8 +15,7 @@ if [ $(uname -m) == x86_64 ]; then
 	apt-get update
 fi
 
-
-# If you get a checksum error, then Steam was likely updated. 
+# If you get a checksum error, Steam was likely updated. 
 # Open an issue or comment out the offending sha1sum line.
 wget http://media.steampowered.com/client/installer/steam.deb
 echo '8d266e853756a23ed848ed03fadf6a4e1dec6e3f  steam.deb' | sha1sum -c && \
