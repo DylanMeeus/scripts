@@ -5,58 +5,50 @@ if [ $(id -u) != 0 ]; then
   exit
 fi
 
-mkdir /tmp/cb-steam && cd /tmp/cb-steam
 mkdir /usr/local/lib/steam
+mkdir /tmp/cb-steam
+cd /tmp/cb-steam
 
 build() {
 apt-get install zenity curl
-if [ $(uname -m) == x86_64 ]; then
+if [ $(uname -m) = x86_64 ]; then
 	dpkg --add-architecture i386
 	apt-get update
+	apt-get install libc6:i386 libgl1-mesa-dri:i386 libgl1-mesa-glx:i386
 fi
 
-# If you get a checksum error, Steam was likely updated. 
+# If you get a checksum error, Steam was likely updated.
 # Open an issue or comment out the offending sha1sum line.
 wget http://media.steampowered.com/client/installer/steam.deb
 echo '8d266e853756a23ed848ed03fadf6a4e1dec6e3f  steam.deb' | sha1sum -c && \
-dpkg -X steam.deb cb-steam && dpkg -e steam.deb cb-steam/DEBIAN
-sed -i 's/2.15/2.13/g' cb-steam/DEBIAN/control || exit
-dpkg -b cb-steam cb-steam.deb
+mkdir cb-steam
+dpkg -X steam.deb cb-steam
+dpkg -e steam.deb cb-steam/DEBIAN
+rm steam.deb
+sed -i 's/2.15/2.13/g' cb-steam/DEBIAN/control || exit 1
 
+dpkg -b cb-steam cb-steam.deb
 dpkg -i cb-steam.deb
 rm -f /etc/apt/sources.list.d/steam.list
 rm -f /etc/apt/trusted.gpg.d/steam.gpg
 }
 
-arch() { 
-if [ $(uname -m) == i686 ] || [ $(uname -m) == i486 ]; then
-	wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_i386.deb
-	echo 'd45fdd5c82d1ffed1ba63a394563243637ce1b97  libc6_2.15-0ubuntu10.5_i386.deb' | sha1sum -c && \
- 	dpkg -X libc6_2.15-0ubuntu10.5_i386.deb libc6_2.15
-  	cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
-  	cat > /usr/bin/cb-steam <<'EOF'
+library() {
+wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_i386.deb
+echo 'd45fdd5c82d1ffed1ba63a394563243637ce1b97  libc6_2.15-0ubuntu10.5_i386.deb' | sha1sum -c && \
+dpkg -X libc6_2.15-0ubuntu10.5_i386.deb libc6_2.15
+cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
+
+cat > /usr/bin/cb-steam <<'EOF'
 #!/bin/bash
 LD_LIBRARY_PATH=/usr/local/lib/steam/i386-linux-gnu:/usr/lib /usr/bin/steam "$@"
 EOF
-	chmod a+x /usr/bin/cb-steam
-
-elif [ $(uname -m) == x86_64 ]; then
-	wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_amd64.deb
-	echo 'ae1698a337689109582a1f318b641f4d3bb55282  libc6_2.15-0ubuntu10.5_amd64.deb' | sha1sum -c && \
-  	dpkg -X libc6_2.15-0ubuntu10.5_amd64.deb libc6_2.15
-  	cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
-  	cat > /usr/bin/cb-steam <<'EOF'
-#!/bin/bash
-LD_LIBRARY_PATH=/usr/local/lib/steam/x86_64-linux-gnu:/usr/lib /usr/bin/steam "$@"
-EOF
-	chmod a+x /usr/bin/cb-steam
-
-fi
+chmod a+x /usr/bin/cb-steam
 }
 
 # LC_ALL=C is only supported by Steam as "fallback", which may cause some games to fail. 
 # This function correctly installs the US locale if not present.
-locale() { 
+locale() {
 if grep -Fxq '# en_US.UTF-8 UTF-8' /etc/locale.gen; then 
 	sed -i 's/# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
 	/usr/sbin/locale-gen
@@ -64,6 +56,5 @@ fi
 }
 
 ## Steam!
-build
-arch
-locale
+build && library && locale
+echo "Please run /usr/bin/cb-steam to run Steam."
