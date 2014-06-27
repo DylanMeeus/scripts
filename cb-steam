@@ -39,11 +39,24 @@ echo 'd45fdd5c82d1ffed1ba63a394563243637ce1b97  libc6_2.15-0ubuntu10.5_i386.deb'
 dpkg -X libc6_2.15-0ubuntu10.5_i386.deb libc6_2.15
 cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
 
-cat > /usr/bin/cb-steam <<'EOF'
+if [ $(uname -m) = x86_64 ]; then
+	wget http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_2.15-0ubuntu10.5_amd64.deb
+	echo 'ae1698a337689109582a1f318b641f4d3bb55282 libc6_2.15-0ubuntu10.5_amd64.deb' | sha1sum -c && \
+	dpkg -X libc6_2.15-0ubuntu10.5_amd64.deb libc6_2.15
+	cp -r libc6_2.15/lib/* /usr/local/lib/steam || exit
+	cat > /usr/bin/cb-steam <<'EOF'
+#!/bin/bash
+LD_LIBRARY_PATH=/usr/local/lib/steam/i386-linux-gnu:/usr/local/lib/steam/x86_64-linux-gnu:/usr/lib:/usr/lib32 /usr/bin/steam "$@"
+EOF
+	chmod a+x /usr/bin/cb-steam
+
+else
+	cat > /usr/bin/cb-steam <<'EOF'
 #!/bin/bash
 LD_LIBRARY_PATH=/usr/local/lib/steam/i386-linux-gnu:/usr/lib /usr/bin/steam "$@"
 EOF
-chmod a+x /usr/bin/cb-steam
+	chmod a+x /usr/bin/cb-steam
+fi
 }
 
 # LC_ALL=C is only supported by Steam as "fallback", which may cause some games to fail. 
