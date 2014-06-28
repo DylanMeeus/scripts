@@ -11,13 +11,12 @@ $LIBDIR=/usr/local/lib/steam
 # Uninstall
 if [ "$1" = "uninstall" ]; then
 	apt-get purge steam*
-	rm -r "$LIBDIR"
+	rm -r "$LIBDIR" "$TMPDIR"
 	rm /usr/bin/cb-steam
 	exit
 fi
 
 mkdir $LIBDIR
-test -d $TMPDIR && rm -r $TMPDIR
 mkdir $TMPDIR
 cd $TMPDIR
 
