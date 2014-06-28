@@ -1,6 +1,6 @@
 *cb-steam*
 
-Steam installer for Debian 7 & friends.
+Steam installer for Debian 7 & friends. Currently broken for 64bit.
 
 ----
 
