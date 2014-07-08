@@ -19,9 +19,10 @@ fi
 devel="quilt debian-keyring devscripts curl fakeroot libdistro-info-perl"
 sudo apt-get install "$devel"
 
-depends() {   
+depends() {
+   # Use dpkg-checkbuilddeps
    sudo apt-get build-dep $pkg
-   # Born and raised in Chernobyl
+   # What if no new packages were installed?
    deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
    | sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
 }
@@ -36,8 +37,8 @@ prepare() {
    quilt import /tmp/099_meds.patch
 }
 
-build() {   
-   dch --local +bbq --distribution $dist "Just what the doctor ordered."
+build() {
+   dch --local +nurse --distribution $dist "Just what the doctor ordered."
    dpkg-buildpackage -us -uc
 }
 
