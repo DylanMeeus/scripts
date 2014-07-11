@@ -41,6 +41,7 @@ base() {
 
 	# System-wide MIME cache.
 	# TODO: user cache
+	# In this case, quotes prevent the array elements from being split.
 	spstore+=($(grep $mime1\= /usr/share/applications/mimeinfo.cache \
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g'))
 }
