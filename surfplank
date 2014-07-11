@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# surfplank - set default browser via MIME (Debian)
-# Depends: xdg-utils libfile-mimeinfo-perl
+# surfplank - set default browser via MIME
+# Depends: xdg-utils libfile-mimeinfo-perl desktop-file-utils
 
 # Disable globbing if it is not needed.
 set -f 
@@ -121,10 +121,9 @@ base
 # TODO: In base(), use shift() instead of select() for 
 # automatic checks. At least, if you then prevent setting 
 # your FTP client or editor as default "browser" ...
-while [[ $spdef1 == "" ]]; do
-	echo "This type is not yet registered."
-	echo -e "Choose a different one.\n"
-	base
+while [[ "$spdef1" == "" ]]; do
+	echo -e "No default set.\n"
+	change
 done
 
 # xdg-mime can only reliably query one type at a time.
