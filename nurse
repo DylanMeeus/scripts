@@ -16,16 +16,8 @@ if (( $UID == 0 )); then
    exit 1
 fi
 
-devel="quilt debian-keyring devscripts curl fakeroot libdistro-info-perl"
+devel="quilt debian-keyring devscripts curl fakeroot libdistro-info-perl equivs"
 sudo apt-get install "$devel"
-
-depends() {
-   # Use dpkg-checkbuilddeps
-   sudo apt-get build-dep $pkg
-   # What if no new packages were installed?
-   deplist=("$(tac /var/log/apt/history.log | grep -m1 Install \
-   | sed "s|\(([^)]*)\)||g;s|,\s||g;s|Install:||")")
-}
 
 prepare() {
    gpg -k # Initialize GPG config
@@ -37,21 +29,27 @@ prepare() {
    quilt import /tmp/099_meds.patch
 }
 
+depends() {
+   mk-build-deps
+   sudo dpkg -i $pkg-build-deps*.deb
+   sudo apt-get install -fy
+}
+
 build() {
    dch --local +nurse --distribution $dist "Just what the doctor ordered."
    dpkg-buildpackage -us -uc
 }
 
-# ================
-depends && prepare
-# ================
+# =====
+prepare
+# =====
 
 case "$?" in
    0)
-      build
+      depends && build
       ;;
    2)
-      build
+      depends && build
       ;;
    *)
       echo "I couldn't cure you."
@@ -62,7 +60,7 @@ esac
 read -rp "Remove build dependencies? [y/n]" OPTION
 case $OPTION in
    [yY])
-      apt-get purge ${deplist[@]}
+      sudo apt-get autoremove --purge $pkg-build-deps
       ;;
    [nN])
       exit
