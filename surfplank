@@ -41,8 +41,8 @@ base() {
 
 	# System-wide MIME cache.
 	# TODO: user cache
-	spstore=("$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
-	| sed 's/.*=//;s/;/\n/g;s/.desktop//g')")
+	spstore+=($(grep $mime1\= /usr/share/applications/mimeinfo.cache \
+	| sed 's/.*=//;s/;/\n/g;s/.desktop//g'))
 }
 
 # Different DEs and browsers set different or insufficient MIME types,
@@ -121,7 +121,7 @@ base
 # TODO: In base(), use shift() instead of select() for 
 # automatic checks. At least, if you then prevent setting 
 # your FTP client or editor as default "browser" ...
-while [[ "$spdef1" == "" ]]; do
+while [[ $spdef1 == "" ]]; do
 	echo -e "No default set.\n"
 	change
 done
