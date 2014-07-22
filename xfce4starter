@@ -1,16 +1,15 @@
 #!/bin/bash
-# xfce4starter - GTFO License
-# credits: archwiki (i3), machinebacon
+# xfce4starter
 #
 # "Magic process" - kill, session dies
 # put last in ~/.xinitrc:
-# exec xfce4starter
+# exec xfce4starter run
+#
+# https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
+# http://linuxbbq.org/bbs/viewtopic.php?f=15&t=1509
+# http://stackoverflow.com/questions/696839/how-do-i-write-a-bash-script-to-restart-a-process-if-it-dies
 
-xfce4_start() {
-	LOCKFILE=$HOME/.xfce4.lock
-	
-	#[[ -f $LOCKFILE ]] && echo "XFCE4 is already started." && exit 0
-
+xfce4_run() {
 	until xfsettingsd & do
 		echo "xfsettingsd ended unexpectedly. Respawning.." >&2
 		sleep 1
@@ -25,34 +24,25 @@ xfce4_start() {
 		echo "xfdesktop ended unexpectedly. Respawning.." >&2
 		sleep 1
 	done
-	
-	#touch "$LOCKFILE"
-	xfwm4 & xfwm4_pid="$!"; wait "$xfwm4_pid"
+
+	xfwm4
 }
 
-#trap "{ rm -f $LOCKFILE ; exit 255 }" EXIT
-#exit 0
-#trap "action" SIGTERM
-#trap "action" SIGKILL
-
-## SESSION
-# sudoers for no password
 LOCK=i3lock-wrapper
+ARG="-15"	# SIGTERM for clean exit
+
 case "$1" in
-	start)
-		xfce4_start
+	run)
+		xfce4_run
 		;;
 	lock)
 		$LOCK
 		;;
 	exit)
-		kill -15 "$xfwm4_pid"	# SIGTERM for orderly exit
-		;;
-	force)
-		kill -9 "$xfwm4_pid"	# SIGKILL if shit breaks
+		killall $ARG xfwm4
 		;;
 	suspend)
-		sudo pm-suspend
+		sudo pm-suspend		# see man sudoers
 		;;
 	hibernate)
 		sudo pm-hibernate
@@ -64,6 +54,6 @@ case "$1" in
 		sudo rc shutdown
 		;;
 	*)
-		echo "Usage: $0 {start|lock|exit|force|suspend|hibernate|reboot|shutdown}"
+		echo "Usage: $0 {run|lock|exit|suspend|hibernate|reboot|shutdown}"
 		exit 2
 esac
