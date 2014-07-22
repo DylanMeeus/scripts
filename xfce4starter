@@ -1,0 +1,55 @@
+#!/bin/bash
+# xfce4starter - GTFO License
+# credits: archwiki (i3), machinebacon
+#
+# "Magic process" - kill, session dies
+# put last in ~/.xinitrc:
+# exec xfce4starter
+
+## AUTOSTART
+# only run this once; respawn on error (except xfwm4)
+if ! pidof xfwm4; then
+	until xfsettingsd & do
+		echo "xfsettingsd ended unexpectedly. Respawning.." >&2
+		sleep 1
+	done
+
+	until xfce4-panel & do
+		echo "xfce4-panel ended unexpectedly. Respawning.." >&2
+		sleep 1
+	done
+
+	until xfdesktop & do
+		echo "xfdesktop ended unexpectedly. Respawning.." >&2
+		sleep 1
+	done
+	
+	xfwm4
+fi
+
+## SESSION
+# sudoers for no password
+LOCK=i3lock
+case "$1" in
+	lock)
+		$LOCK
+		;;
+	logout)
+		killall "$0" || killall xfwm4
+		;;
+	suspend)
+		sudo pm-suspend
+		;;
+	hibernate)
+		sudo pm-hibernate
+		;;
+	reboot)
+		sudo rc reboot
+		;;
+	shutdown)
+		sudo rc shutdown
+		;;
+	*)
+		echo "Usage: $0 {lock|logout|suspend|hibernate|reboot|shutdown}"
+		exit 2
+esac
