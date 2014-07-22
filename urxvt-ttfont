@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# urxvt-ttfont
+# set the urxvt font interactively
+
+# Vars
+FONTPATH="/usr/share/fonts/TTF" # /truetype in debian
+FONTS+=($(ls $FONTPATH | awk -F. '{print $1}'))
+FONTDEF="xft:DejaVuSansMono-10" # Dirty hack
+
+# Select font
+select FONTNEW in "${FONTS[@]}"; do
+	read -rp "Enter the font size. " FONTSIZE
+	break
+done
+ 
+XRES="xft:$FONTNEW-$FONTSIZE" 
+printf '\e]710;%s\007' "$XRES" # https://gist.github.com/livibetter/7178625
+
+# LOREM IPSUM
+echo -------------------------------------------------------------------------------------
+echo \"On the other hand, we denounce with righteous indignation and dislike men who are
+echo so beguiled and demoralized by the charms of pleasure of the moment, so blinded by
+echo desire, that they cannot foresee the pain and trouble that are bound to ensue\; and
+echo equal blame belongs to those who fail in their duty through weakness of will, which
+echo is the same as saying through shrinking from toil and pain.
+echo
+echo These cases are perfectly simple and easy to distinguish. In a free hour, when our 
+echo power of choice is untrammelled and when nothing prevents our being able to do what 
+echo we like best, every pleasure is to be welcomed and every pain avoided. But in certain 
+echo circumstances and owing to the claims of duty or the obligations of business it will 
+echo frequently occur that pleasures have to be repudiated and annoyances accepted.
+echo
+echo The wise man therefore always holds in these matters to this principle of selection: 
+echo he rejects pleasures to secure other greater pleasures, or else he endures pains to
+echo avoid worse pains.\"
+echo -------------------------------------------------------------------------------------
+echo
+
+xsave() {
+	if grep "^URxvt.*font" ~/.Xresources; then
+		sed -i "s|^URxvt.*font.*|URxvt.font: $XRES|" ~/.Xresources
+	else
+		echo "URxvt.font: $XRES" >> ~/.Xresources
+	fi
+	xrdb ~/.Xresources
+}
+
+read -rp "Save the font configuration? [y/n]" OPT
+case $OPT in
+	[yY]) xsave;;
+	[nN]) printf '\e]710;%s\007' "$FONTDEF";;
+esac
