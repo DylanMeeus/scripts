@@ -30,8 +30,9 @@ xfce4_run() {
 }
 
 LOCK=i3lock-wrapper
-WM_PID=$(xprop -id $(xprop -root _NET_SUPPORTING_WM_CHECK | awk -F'#' '{ print $2 }') \
-_NET_WM_PID | awk -F' = ' '{ print $2 }')
+WM_PID=$(xprop -id $(xprop -root _NET_SUPPORTING_WM_CHECK \
+| awk -F'#' '{ print $2 }') _NET_WM_PID \
+| awk -F' = ' '{ print $2 }')
 
 case "$1" in
 	run)
