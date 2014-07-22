@@ -7,8 +7,8 @@
 #
 # https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
 # http://linuxbbq.org/bbs/viewtopic.php?f=15&t=1509
-# http://stackoverflow.com/questions/696839/how-do-i-write-a-bash-script-to-restart-a-process-if-it-dies
-# http://unix.stackexchange.com/questions/20370/is-there-a-simple-linux-command-that-will-tell-me-what-my-display-manager-is
+# http://stackoverflow.com/questions/696839
+# http://unix.stackexchange.com/questions/20370
 
 xfce4_run() {
 	until xfsettingsd & do
