@@ -1,12 +1,13 @@
 #!/bin/bash
 # xfce4starter
-# credits: archwiki (i3), machinebacon
 #
-# "Magic process" - kill, session dies
+# "Magic process": kill, session dies
+# http://www.linuxbbq.org/bbs/index.php
 # put last in ~/.xinitrc:
 # exec xfce4starter
 
 ## AUTOSTART
+# http://stackoverflow.com/questions/696839/how-do-i-write-a-bash-script-to-restart-a-process-if-it-dies
 # only run this once; respawn on error (except xfwm4)
 if ! pidof xfwm4; then
 	until xfsettingsd & do
@@ -28,6 +29,7 @@ if ! pidof xfwm4; then
 fi
 
 ## SESSION
+# https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
 # sudoers for no password
 LOCK=i3lock
 case "$1" in
