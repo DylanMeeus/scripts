@@ -1,8 +1,8 @@
 #!/bin/bash
 # xfce4starter
 #
+# http://www.linuxbbq.org/bbs/viewtopic.php?f=15&t=1509
 # "Magic process": kill, session dies
-# http://www.linuxbbq.org/bbs/index.php
 # put last in ~/.xinitrc:
 # exec xfce4starter
 
