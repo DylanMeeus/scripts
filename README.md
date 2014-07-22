@@ -31,3 +31,9 @@ Slightly modified version of: https://wiki.archlinux.org/index.php/Dotpac
 *xfce4starter*
 
 Drop-in replacement for xfce4-session
+
+----
+
+*urxvt-ttfont*
+
+Set the rxvt-unicode (truetype) font interactively
