@@ -6,8 +6,6 @@
 # put last in ~/.xinitrc:
 # exec xfce4starter
 
-######
-
 xfce4_start() {
 	LOCKFILE=$HOME/.xfce4.lock
 	
