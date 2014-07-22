@@ -37,7 +37,7 @@ case "$1" in
 		$LOCK
 		;;
 	logout)
-		killall "$0" || killall xfwm4
+		killall "$0"
 		;;
 	suspend)
 		sudo pm-suspend
