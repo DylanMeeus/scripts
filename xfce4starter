@@ -8,6 +8,7 @@
 # https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
 # http://linuxbbq.org/bbs/viewtopic.php?f=15&t=1509
 # http://stackoverflow.com/questions/696839/how-do-i-write-a-bash-script-to-restart-a-process-if-it-dies
+# http://unix.stackexchange.com/questions/20370/is-there-a-simple-linux-command-that-will-tell-me-what-my-display-manager-is
 
 xfce4_run() {
 	until xfsettingsd & do
@@ -29,7 +30,8 @@ xfce4_run() {
 }
 
 LOCK=i3lock-wrapper
-ARG="-15"	# SIGTERM for clean exit
+WM_PID=$(xprop -id $(xprop -root _NET_SUPPORTING_WM_CHECK | awk -F'#' '{ print $2 }') \
+_NET_WM_PID | awk -F' = ' '{ print $2 }')
 
 case "$1" in
 	run)
@@ -39,7 +41,7 @@ case "$1" in
 		$LOCK
 		;;
 	exit)
-		killall $ARG xfwm4
+		kill -15 $WM_PID
 		;;
 	suspend)
 		sudo pm-suspend		# see man sudoers
