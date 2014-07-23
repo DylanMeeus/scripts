@@ -11,6 +11,11 @@
 # http://unix.stackexchange.com/questions/20370
 
 xfce4_run() {
+	if (( $UID == 0 )); then
+		echo "Xfce should not be run as root."
+		exit 1
+	fi
+	
 	until xfsettingsd & do
 		echo "xfsettingsd ended unexpectedly. Respawning.." >&2
 		sleep 1
