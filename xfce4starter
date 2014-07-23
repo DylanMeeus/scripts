@@ -19,7 +19,7 @@ xfce4_run() {
 		exit 1
 	fi
 
-	until $XF1 & do
+	until $XF1 & do		# quotes break arguments
 		echo "$XF1 ended unexpectedly. Respawning.." >&2
 		sleep 1
 	done
