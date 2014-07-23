@@ -19,7 +19,8 @@ xfce4_run() {
 		exit 1
 	fi
 
-	until $XF1 & do		# quotes break arguments
+	# quotes break arguments
+	until $XF1 & do
 		echo "$XF1 ended unexpectedly. Respawning.." >&2
 		sleep 1
 	done
@@ -34,7 +35,8 @@ xfce4_run() {
 		sleep 1
 	done
 
-	xfwm4	# only runs in foreground
+	# only runs in foreground
+	xfwm4
 }
 
 LOCK=i3lock-wrapper
@@ -42,6 +44,7 @@ WM_PID=$(xprop -id $(xprop -root _NET_SUPPORTING_WM_CHECK \
 | awk -F'#' '{ print $2 }') _NET_WM_PID \
 | awk -F' = ' '{ print $2 }')
 
+# see man sudoers
 case "$1" in
 	run)
 		xfce4_run
@@ -53,7 +56,7 @@ case "$1" in
 		kill -15 $WM_PID
 		;;
 	suspend)
-		sudo pm-suspend		# see man sudoers
+		sudo pm-suspend
 		;;
 	hibernate)
 		sudo pm-hibernate
