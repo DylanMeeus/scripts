@@ -1,37 +1,40 @@
 #!/bin/bash
 # xfce4starter
 #
-# "Magic process" - kill, session dies
 # put last in ~/.xinitrc:
 # exec xfce4starter run
 #
-# https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
 # http://linuxbbq.org/bbs/viewtopic.php?f=15&t=1509
+# https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
 # http://stackoverflow.com/questions/696839
 # http://unix.stackexchange.com/questions/20370
 
+XF1='xfsettingsd'
+XF2='xfce4-panel'
+XF3='xfdesktop'
+
 xfce4_run() {
 	if (( $UID == 0 )); then
-		echo "Xfce should not be run as root."
+		echo "XFCE4 should not be run as root."
 		exit 1
 	fi
-	
-	until xfsettingsd & do
-		echo "xfsettingsd ended unexpectedly. Respawning.." >&2
+
+	until $XF1 & do
+		echo "$XF1 ended unexpectedly. Respawning.." >&2
 		sleep 1
 	done
 
-	until xfce4-panel & do
-		echo "xfce4-panel ended unexpectedly. Respawning.." >&2
+	until $XF2 & do
+		echo "$XF2 ended unexpectedly. Respawning.." >&2
 		sleep 1
 	done
 
-	until xfdesktop & do
-		echo "xfdesktop ended unexpectedly. Respawning.." >&2
+	until $XF3 & do
+		echo "$XF3 ended unexpectedly. Respawning.." >&2
 		sleep 1
 	done
 
-	xfwm4
+	xfwm4	# only runs in foreground
 }
 
 LOCK=i3lock-wrapper
