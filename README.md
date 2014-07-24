@@ -30,7 +30,7 @@ Slightly modified version of: https://wiki.archlinux.org/index.php/Dotpac
 
 *xfce4starter*
 
-Drop-in replacement for xfce4-session
+Suckless drop-in for xfce4-session
 
 ----
 
