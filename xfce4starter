@@ -56,10 +56,10 @@ case "$1" in
 		kill -15 $WM_PID
 		;;
 	suspend)
-		sudo pm-suspend
+		$LOCK && sudo pm-suspend
 		;;
 	hibernate)
-		sudo pm-hibernate
+		$LOCK && sudo pm-hibernate
 		;;
 	reboot)
 		sudo rc reboot
