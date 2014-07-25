@@ -9,33 +9,10 @@
 # http://stackoverflow.com/questions/696839
 # http://unix.stackexchange.com/questions/20370
 
-XF1='xfsettingsd'
-XF2='xfce4-panel'
-XF3='xfdesktop'
-
 xfce4_run() {
-	if (( $UID == 0 )); then
-		echo "XFCE4 should not be run as root."
-		exit 1
-	fi
-
-	# quotes break arguments
-	until $XF1 & do
-		echo "$XF1 ended unexpectedly. Respawning.." >&2
-		sleep 1
-	done
-
-	until $XF2 & do
-		echo "$XF2 ended unexpectedly. Respawning.." >&2
-		sleep 1
-	done
-
-	until $XF3 & do
-		echo "$XF3 ended unexpectedly. Respawning.." >&2
-		sleep 1
-	done
-
-	# only runs in foreground
+	xfsettingsd &
+	xfce4-panel &
+	xfdesktop &
 	xfwm4
 }
 
