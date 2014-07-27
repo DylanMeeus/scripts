@@ -43,6 +43,11 @@ base() {
 	# In this case, quotes prevent the array elements from being split.
 	spstore+=($(grep $mime1\= /usr/share/applications/mimeinfo.cache \
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g'))
+
+	# XFCE uses exo
+	if [[ -f /usr/share/applications/exo-web-browser.desktop ]]; then
+		spstore+=( exo-web-browser )
+	fi
 }
 
 # Different DEs and browsers set different or insufficient MIME types,
@@ -93,8 +98,10 @@ surf() {
 		update-alternatives --query x-www-browser \
 		| grep -e Name -e Status -e Value
 		
-		echo -e "\nThe user browser is set to:"
-		echo -e "$plank\n"
+		echo "The user browser is set to:"
+		echo
+		echo "$plank"
+		echo
 		echo "The system browser may be configured with:"
 		echo "# update-alternatives --config x-www-browser"
 		echo "In most cases this is unnecessary."
@@ -122,7 +129,8 @@ base
 # automatic checks. At least, if you then prevent setting 
 # your FTP client or editor as default "browser" ...
 while [[ $spdef1 == "" ]]; do
-	echo -e "No default set.\n"
+	echo "No default set."
+	echo
 	change
 done
 
@@ -140,7 +148,8 @@ compare
 
 if [[ $sperr = 0 ]]; then
 	echo "The registered browser is $plank."
-	echo -e 'Press "c" to change, or any other key to quit.\n'
+	echo 'Press "c" to change, or any other key to quit.'
+	echo
 	read -r -n1 q2
 
 	case "$q2" in
@@ -154,7 +163,8 @@ if [[ $sperr = 0 ]]; then
 
 else
 	echo "The registered browser is $plank, but is not consistent across MIME types."
-	echo -e 'Press "y" to correct, "c" to change, or any other key to quit.\n'
+	echo -'Press "y" to correct, "c" to change, or any other key to quit.'
+	echo
 	read -r -n1 q3
 
 	case "$q3" in
