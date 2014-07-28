@@ -8,19 +8,31 @@
 # https://wiki.archlinux.org/index.php/I3#Shutdown.2C_reboot.2C_lock_screen
 # http://unix.stackexchange.com/questions/20370
 
+LOCK=i3lock-wrapper
+
+xfce4_load() {
+	xset s 3000 3000 &	# 50 min blank
+	xset dpms 3600 &	# 60 min suspend
+	#xautolock -time 60 -locker $LOCK &
+
+	setxkbmap -layout gb -variant extd -option ctrl:nocaps &
+	numlock off &
+}
+
 xfce4_run() {
 	if (( $UID == 0 )); then
 		echo "Xfce4 should not be run as root."
 		exit 1
 	fi
-	
+
+	spacefm -d &
 	xfsettingsd &
-	xfce4-panel &
 	xfdesktop &
-	xfwm4
+	xfce4-panel &
+	xfwm4		# Foreground only
 }
 
-LOCK=i3lock-wrapper
+# Get the current xfwm4 process ID
 WM_PID=$(xprop -id $(xprop -root _NET_SUPPORTING_WM_CHECK \
 | awk -F'#' '{ print $2 }') _NET_WM_PID \
 | awk -F' = ' '{ print $2 }')
@@ -28,7 +40,11 @@ WM_PID=$(xprop -id $(xprop -root _NET_SUPPORTING_WM_CHECK \
 # see man sudoers
 case "$1" in
 	run)
+		xfce4_load
 		xfce4_run
+		;;
+	load)
+		xfce4_load
 		;;
 	lock)
 		$LOCK
@@ -37,10 +53,12 @@ case "$1" in
 		kill -15 $WM_PID
 		;;
 	suspend)
-		$LOCK && sudo pm-suspend
+		# $LOCK && \
+		sudo pm-suspend
 		;;
 	hibernate)
-		$LOCK && sudo pm-hibernate
+		# $LOCK && \
+		sudo pm-hibernate
 		;;
 	reboot)
 		sudo kill -2 1
@@ -49,6 +67,6 @@ case "$1" in
 		sudo kill -10 1
 		;;
 	*)
-		echo "Usage: $0 {run|lock|exit|suspend|hibernate|reboot|shutdown}"
+		echo "Usage: $0 {run|load|lock|exit|suspend|hibernate|reboot|shutdown}"
 		exit 2
 esac
