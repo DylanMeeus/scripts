@@ -39,10 +39,10 @@ case "$1" in
 		$LOCK && sudo pm-hibernate
 		;;
 	reboot)
-		sudo rc reboot
+		sudo kill -2 1
 		;;
 	shutdown)
-		sudo rc shutdown
+		sudo kill -10 1
 		;;
 	*)
 		echo "Usage: $0 {run|lock|exit|suspend|hibernate|reboot|shutdown}"
