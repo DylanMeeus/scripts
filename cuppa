@@ -10,10 +10,10 @@ if [ $(id -u) != 0 ]; then
 fi
 
 function install() {
-$root "apt-get install cups cups-pdf printer-driver-hpijs \
-	|| exit 1 \
-	; adduser $(grep 1000 /etc/passwd | cut -d':' -f1) lpadmin \
-	; cat > /usr/share/applications/cupsconfig.desktop <<EOF
+$root <<EOF
+apt-get install cups cups-pdf printer-driver-hpijs || exit 1
+adduser $(grep 1000 /etc/passwd | cut -d':' -f1) lpadmin
+cat > /usr/share/applications/cupsconfig.desktop <<TAC
 [Desktop Entry]
 Name=Printer configuration
 Comment=Configure CUPS
@@ -23,7 +23,8 @@ Terminal=false
 Type=Application
 StartupNotify=true
 Categories=GTK;Settings;DesktopSettings;
-EOF"
+TAC
+EOF
 }
 
 echo "Install CUPS (Common Unix Printing System)"
