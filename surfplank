@@ -12,7 +12,13 @@ if (( $UID == 0 )); then
 	exit 1
 fi
 
+echo "Which default do you wish to set?"
+select sptype in BROWSER EDITOR PDF; do
+	break
+done
+
 # Browser MIME types. Adjust as needed.
+if [[ $sptype == BROWSER ]]; then
 mimes=(\
 	x-scheme-handler/http \
 	x-scheme-handler/https \
@@ -28,11 +34,52 @@ mimes=(\
 	application/x-extension-xht \
 	text/html \
 )
+fi
 
+# Editor MIME types.
+if [[ $sptype == EDITOR ]]; then
+mimes=(\
+	text/plain \
+	text/english \
+	text/x-c \
+	text/x-chdr \
+	text/x-csrc \
+	text/x-c++ \
+	text/x-c++hdr \
+	text/x-c++src \
+	text/x-java \
+	text/x-dsrc \
+	text/x-moc \
+	text/x-pascal \
+	text/x-perl \
+	text/x-python \
+	text/x-makefile \
+	text/x-tcl \
+	text/x-text \
+	application/x-php \
+	application/x-httpd-php3 \
+	application/x-httpd-php4 \
+	application/x-httpd-php5 \
+	application/xml \
+	application/x-shellscript \
+	text/css \
+	text/x-sql \
+	text/x-diff \
+)
+fi
+
+if [[ $sptype == PDF ]]; then
+mimes=(\
+	application/pdf
+)
+fi
+
+# Functions. local variables are typically not used, so that they can be
+# shared between functions.
 base() {
 	# select() is rather limited here.
 	# TODO: Allow to exclude certain types
-	echo "Choose the base MIME type to compare against:"
+	echo "Choose the base MIME type:"
 	select mime1 in "${mimes[@]}"; do
 		spdef1="$(xdg-mime query default $mime1)"
 		break
@@ -45,9 +92,14 @@ base() {
 	| sed 's/.*=//;s/;/\n/g;s/.desktop//g'))
 
 	# XFCE uses exo
-	if [[ -f /usr/share/applications/exo-web-browser.desktop ]]; then
-		spstore+=( exo-web-browser )
+	if [[ $sptype == BROWSER ]]; then
+		if [[ -f /usr/share/applications/exo-web-browser.desktop ]]; then
+			spstore+=( exo-web-browser )
+		fi
 	fi
+	
+	# Custom desktop file
+	spstore+=( '(custom)' )
 }
 
 # Different DEs and browsers set different or insufficient MIME types,
@@ -82,40 +134,51 @@ surf() {
 
 	# Match the base MIME type.
 	xdg-mime default $spdef1 "${mimes[@]}"
+	
+	if [[ $sptype == BROWSER ]]; then
+		# FIXME: sensible-browser (Debian) may ignore $BROWSER
+		if ! grep ".bashrc.browser" ~/.bashrc --quiet; then
+			echo "source ~/.bashrc.browser" >> ~/.bashrc
+		fi
 
-	# FIXME: sensible-browser (Debian) may ignore $BROWSER
-	if ! grep ".bashrc.browser" ~/.bashrc --quiet; then
-		echo "source ~/.bashrc.browser" >> ~/.bashrc
+		# FIXME: .desktop prefix may not match $PATH
+		echo "export BROWSER=$plank" > ~/.bashrc.browser
+
+		# Compare default to x-www-browser alternative. If sensible-browser or
+		# xdg-open are used, this is more informative than necessary.
+		if [[ -x /usr/bin/x-www-browser ]]; then
+			echo "The system browser is set to:"
+			update-alternatives --query x-www-browser \
+			| grep -e Name -e Status -e Value
+			
+			echo "The user browser is set to:"
+			echo
+			echo "$plank"
+			echo
+			echo "The system browser may be configured with:"
+			echo "# update-alternatives --config x-www-browser"
+			echo "In most cases this is unnecessary."
+		fi
 	fi
-
-	# FIXME: .desktop prefix may not match $PATH
-	echo "export BROWSER=$plank" > ~/.bashrc.browser
-
-	# Compare default to x-www-browser alternative. If sensible-browser or
-	# xdg-open are used, this is more informative than necessary.
-	if [[ -x /usr/bin/x-www-browser ]]; then
-		echo "The system browser is set to:"
-		update-alternatives --query x-www-browser \
-		| grep -e Name -e Status -e Value
-		
-		echo "The user browser is set to:"
-		echo
-		echo "$plank"
-		echo
-		echo "The system browser may be configured with:"
-		echo "# update-alternatives --config x-www-browser"
-		echo "In most cases this is unnecessary."
+	
+	if [[ $sptype == EDITOR ]]; then
+		# TODO: If EDITOR is set to a GUI editor, it may be referred to
+		# by console applications. This is not always expected behaviour.
+		:
 	fi
 }
 
 clean() {
-	# TODO: Remove ~/.local/share/applications/browser*.desktop?
+	# TODO: Remove ~/.local/share/applications/*.desktop?
 	:
 }
 
 change() {
-	echo "Choose the default browser"
+	echo "Choose the default $sptype."
 	select plank in "${spstore[@]}"; do
+		if [[ $plank == '(custom)' ]]; then
+			read -rp "Enter a .desktop (prefix) " plank
+		fi
 		spdef1=$plank.desktop
 		break
 	done
@@ -147,7 +210,7 @@ compare
 # =====
 
 if [[ $sperr = 0 ]]; then
-	echo "The registered browser is $plank."
+	echo "The registered $sptype is $plank."
 	echo 'Press "c" to change, or any other key to quit.'
 	echo
 	read -r -n1 q2
@@ -162,7 +225,7 @@ if [[ $sperr = 0 ]]; then
 	esac
 
 else
-	echo "The registered browser is $plank, but is not consistent across MIME types."
+	echo "The registered $sptype is $plank, but is not consistent across MIME types."
 	echo -'Press "y" to correct, "c" to change, or any other key to quit.'
 	echo
 	read -r -n1 q3
