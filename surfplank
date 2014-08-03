@@ -136,7 +136,9 @@ surf() {
 	xdg-mime default $spdef1 "${mimes[@]}"
 
 	# Some applications use defaults.list
-	ln -s $spath/mimeapps.list $spath/defaults.list
+	if [[ -a $spath/defaults.list ]]; then
+		ln -s $spath/mimeapps.list $spath/defaults.list
+	fi
 	
 	if [[ $sptype == BROWSER ]]; then
 		# FIXME: sensible-browser (Debian) may ignore $BROWSER
