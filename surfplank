@@ -122,18 +122,21 @@ compare() {
 
 surf() {
 	# xdg-mime fails if this directory does not exist
-	if [[ -d ~/.local/share/applications ]]; then
-		cd ~/.local/share/applications
+	spath="~/.local/share/applications"
+	if [[ -d $spath ]]; then
 		# Only copy existing files
-		if [[ -a mimeapps.list ]]; then
-			cp mimeapps.list mimeapps.list.bak
+		if [[ -a $spath/mimeapps.list ]]; then
+			cp $spath/mimeapps.list $spath/mimeapps.list.bak
 		fi
 	else
-		mkdir -p ~/.local/share/applications
+		mkdir -p $spath
 	fi
 
 	# Match the base MIME type.
 	xdg-mime default $spdef1 "${mimes[@]}"
+
+	# Some applications use defaults.list
+	ln -s $spath/mimeapps.list $spath/defaults.list
 	
 	if [[ $sptype == BROWSER ]]; then
 		# FIXME: sensible-browser (Debian) may ignore $BROWSER
