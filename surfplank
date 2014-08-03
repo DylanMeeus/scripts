@@ -136,7 +136,7 @@ surf() {
 	xdg-mime default $spdef1 "${mimes[@]}"
 
 	# Some applications use defaults.list
-	if [[ -a $spath/defaults.list ]]; then
+	if [[ ! -a $spath/defaults.list ]]; then
 		ln -s $spath/mimeapps.list $spath/defaults.list
 	fi
 	
