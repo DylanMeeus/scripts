@@ -68,12 +68,6 @@ mimes=(\
 )
 fi
 
-if [[ $sptype == PDF ]]; then
-mimes=(\
-	application/pdf
-)
-fi
-
 # Functions. local variables are typically not used, so that they can be
 # shared between functions.
 base() {
