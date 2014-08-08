@@ -13,60 +13,65 @@ if (( $UID == 0 )); then
 fi
 
 echo "Which default do you wish to set?"
-select sptype in BROWSER EDITOR PDF; do
+select sptype in BROWSER EDITOR; do
 	break
 done
 
+# Tests
+browse() {
+	[[ $sptype == BROWSER ]]
+}
+
+edit() {
+	[[ $sptype == EDITOR ]]
+}
+
 # Browser MIME types. Adjust as needed.
-if [[ $sptype == BROWSER ]]; then
-mimes=(\
-	x-scheme-handler/http \
-	x-scheme-handler/https \
-	x-scheme-handler/about \
-	x-scheme-handler/ftp \
-	x-scheme-handler/chrome \
-	x-scheme-handler/unknown \
-	application/x-extension-htm \
-	application/x-extension-html \
-	application/x-extension-shtml \
-	application/xhtml+xml \
-	application/x-extension-xhtml \
-	application/x-extension-xht \
-	text/html \
+browse && mimes=(
+	x-scheme-handler/http
+	x-scheme-handler/https
+	x-scheme-handler/about
+	x-scheme-handler/ftp
+	x-scheme-handler/chrome
+	x-scheme-handler/unknown
+	application/x-extension-htm
+	application/x-extension-html
+	application/x-extension-shtml
+	application/xhtml+xml
+	application/x-extension-xhtml
+	application/x-extension-xht
+	text/html
 )
-fi
 
 # Editor MIME types.
-if [[ $sptype == EDITOR ]]; then
-mimes=(\
-	text/plain \
-	text/english \
-	text/x-c \
-	text/x-chdr \
-	text/x-csrc \
-	text/x-c++ \
-	text/x-c++hdr \
-	text/x-c++src \
-	text/x-java \
-	text/x-dsrc \
-	text/x-moc \
-	text/x-pascal \
-	text/x-perl \
-	text/x-python \
-	text/x-makefile \
-	text/x-tcl \
-	text/x-text \
-	application/x-php \
-	application/x-httpd-php3 \
-	application/x-httpd-php4 \
-	application/x-httpd-php5 \
-	application/xml \
-	application/x-shellscript \
-	text/css \
-	text/x-sql \
-	text/x-diff \
+edit && mimes=(
+	text/plain
+	text/english
+	text/x-c
+	text/x-chdr
+	text/x-csrc
+	text/x-c++
+	text/x-c++hdr
+	text/x-c++src
+	text/x-java
+	text/x-dsrc
+	text/x-moc
+	text/x-pascal
+	text/x-perl
+	text/x-python
+	text/x-makefile
+	text/x-tcl
+	text/x-text
+	application/x-php
+	application/x-httpd-php3
+	application/x-httpd-php4
+	application/x-httpd-php5
+	application/xml
+	application/x-shellscript
+	text/css
+	text/x-sql
+	text/x-diff
 )
-fi
 
 # Functions. local variables are typically not used, so that they can be
 # shared between functions.
@@ -78,19 +83,20 @@ base() {
 		spdef1="$(xdg-mime query default $mime1)"
 		break
 	done
+	
 	plank=${spdef1%.desktop}
 
 	# System-wide MIME cache.
 	# In this case, quotes prevent the array elements from being split.
-	spstore+=($(grep $mime1\= /usr/share/applications/mimeinfo.cache \
-	| sed 's/.*=//;s/;/\n/g;s/.desktop//g'))
+	spstore+=(
+		$(grep $mime1\= /usr/share/applications/mimeinfo.cache \
+		| sed 's/.*=//;s/;/\n/g;s/.desktop//g')
+	)
 
 	# XFCE uses exo
-	if [[ $sptype == BROWSER ]]; then
-		if [[ -f /usr/share/applications/exo-web-browser.desktop ]]; then
-			spstore+=( exo-web-browser )
-		fi
-	fi
+	browse && \
+		[[ -f /usr/share/applications/exo-web-browser.desktop ]] && \
+		spstore+=( 'exo-web-browser' )
 	
 	# Custom desktop file
 	spstore+=( '(custom)' )
@@ -134,7 +140,7 @@ surf() {
 		ln -s $spath/mimeapps.list $spath/defaults.list
 	fi
 	
-	if [[ $sptype == BROWSER ]]; then
+	browse && \
 		# FIXME: sensible-browser (Debian) may ignore $BROWSER
 		if ! grep ".bashrc.browser" ~/.bashrc --quiet; then
 			echo "source ~/.bashrc.browser" >> ~/.bashrc
@@ -158,13 +164,11 @@ surf() {
 			echo "# update-alternatives --config x-www-browser"
 			echo "In most cases this is unnecessary."
 		fi
-	fi
 	
-	if [[ $sptype == EDITOR ]]; then
+	edit && \
 		# TODO: If EDITOR is set to a GUI editor, it may be referred to
 		# by console applications. This is not always expected behaviour.
 		:
-	fi
 }
 
 clean() {
@@ -176,7 +180,7 @@ change() {
 	echo "Choose the default $sptype."
 	select plank in "${spstore[@]}"; do
 		if [[ $plank == '(custom)' ]]; then
-			read -rp "Enter a .desktop (prefix) " plank
+			read -rp "Enter a .desktop (prefix only) " plank
 		fi
 		spdef1=$plank.desktop
 		break
@@ -201,7 +205,9 @@ spdefs=()
 for m in "${mimes[@]}"; do
 	# Quoting! Otherwise blank elements are disregarded,
 	# thus not matching select() in base().
-	spdefs+=("$(xdg-mime query default $m)")
+	spdefs+=(
+		"$(xdg-mime query default $m)"
+	)
 done
 
 # =====
