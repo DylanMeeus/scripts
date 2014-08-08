@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Exclude internal devices.
+RANGE+=$(ls /dev/sd* | grep -v [a,b])
+
+# Optical drives.
+OPT="/dev/sr*"
+
+# Helper functions.
+clean_command() {
+	sync
+	udevil --verbose clean
+}
+
+mount_command() {
+	clean_command
+	udevil --verbose mount "$1"
+}
+
+umount_command() {
+	clean_command
+	udevil --verbose umount -f "$1"
+	clean_command
+}
+
+opt_command() {
+	clean_command
+	sudo eject "$1"
+	clean_command
+}
+
+# Mount functions.
+mount_usb() {
+	for i in $RANGE
+		do mount_command "$i"
+	done
+}
+
+umount_usb() {
+	for i in $RANGE
+		do umount_command "$i"
+	done
+}
+
+umount_opt() {
+    for i in $OPT
+		do opt_command "$i"
+    done
+}
+
+enumerate() {
+    echo
+    for i in $RANGE $OPT
+		do udevil info "$i" \
+			| grep -e device-file -e label.*[A-Z].* -e "is mounted"
+		echo
+    done
+}
+
+case "$1" in
+    -c)
+		clean_command
+		;;
+    -m)
+		mount_command "$2"
+		;;
+	-ma)
+		mount_usb
+		;;
+    -u)
+		umount_command "$2"
+		;;
+    -ua)
+		umount_usb
+		;;
+    -uo)
+		umount_opt
+		;;
+    -num)
+		enumerate
+		;;
+    *)
+		echo "No command specified" >&2
+esac
