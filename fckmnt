@@ -58,27 +58,28 @@ enumerate() {
 }
 
 case "$1" in
-    -c)
+	-c)
 		clean_command
 		;;
-    -m)
+	-m)
 		mount_command "$2"
 		;;
 	-ma)
 		mount_usb
 		;;
-    -u)
+	-u)
 		umount_command "$2"
 		;;
-    -ua)
+	-ua)
 		umount_usb
 		;;
-    -uo)
+	-uo)
 		umount_opt
 		;;
-    -num)
+	-num)
 		enumerate
 		;;
-    *)
+	*)
 		echo "No command specified" >&2
+		;;
 esac
