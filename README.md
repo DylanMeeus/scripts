@@ -37,3 +37,9 @@ Set the rxvt-unicode (truetype) font interactively
 *defsound*
 
 Set the default ALSA sound card.
+
+----
+
+*gadreel*
+
+Functions for udevil.
