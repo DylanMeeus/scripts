@@ -16,12 +16,6 @@ Set or repair the default browser. See: http://crunchbang.org/forums/viewtopic.p
 
 ----
 
-*cuppa*
-
-Simple Debian CUPS support.
-
-----
-
 *dotpac*
 
 Slightly modified version of: https://wiki.archlinux.org/index.php/Dotpac
@@ -37,3 +31,9 @@ Suckless drop-in for xfce4-session and xfce4-power-manager
 *urxvt-ttfont*
 
 Set the rxvt-unicode (truetype) font interactively
+
+----
+
+*defsound*
+
+Set the default ALSA sound card.
